@@ -175,4 +175,16 @@ closeModal.addEventListener("click",()=>{
     modal.style.display = "none";
 });
 
+const accountBtn =
+document.querySelector("#account-btn");
 
+const loggedInUser =
+localStorage.getItem("loggedInUser");
+
+if(accountBtn && loggedInUser){
+
+    accountBtn.innerHTML = `
+        <span class="user-icon">👤</span>
+        ${loggedInUser}
+    `;
+}

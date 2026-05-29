@@ -565,3 +565,50 @@ body{
 
     color:var(--primary-color);
 }
+
+.auth-section{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+}
+
+.auth-card{
+
+    width:400px;
+
+    background:var(--navbar-color);
+
+    padding:40px;
+
+    border-radius:15px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+}
+
+.auth-card h2{
+
+    text-align:center;
+
+    color:var(--primary-color);
+}
+
+.auth-input{
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:var(--section-bg);
+
+    color:white;
+}
