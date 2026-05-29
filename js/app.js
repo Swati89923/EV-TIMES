@@ -48,9 +48,14 @@ newsData.forEach((news,index)=>{
         ${news.date}
     </span>
 
-    <button class="read-more-btn">
-        Read More
-    </button>
+ <button 
+    class="read-more-btn"
+    data-title="${news.title}"
+    data-description="${news.description}"
+    data-image="${news.image}"
+>
+    Read More
+</button>
 
 </div>
 
@@ -137,3 +142,37 @@ loadMoreBtn.addEventListener("click", ()=>{
     loadMoreBtn.style.display = "none";
 
 });
+
+const modal = document.querySelector(".modal");
+
+const modalTitle = document.querySelector(".modal-title");
+
+const modalDescription = document.querySelector(".modal-description");
+
+const modalImage = document.querySelector(".modal-image");
+
+const closeModal = document.querySelector(".close-modal");
+
+document.addEventListener("click",(e)=>{
+
+    if(e.target.classList.contains("read-more-btn")){
+
+        modal.style.display = "flex";
+
+        modalTitle.innerText =
+        e.target.dataset.title;
+
+        modalDescription.innerText =
+        e.target.dataset.description;
+
+        modalImage.src =
+        e.target.dataset.image;
+    }
+});
+
+closeModal.addEventListener("click",()=>{
+
+    modal.style.display = "none";
+});
+
+
