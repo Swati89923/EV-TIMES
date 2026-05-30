@@ -47,3 +47,49 @@ if(signupBtn){
     });
 
 }
+
+const loginBtn = document.querySelector("#login-btn");
+
+if(loginBtn){
+
+    loginBtn.addEventListener("click",()=>{
+
+        const email =
+        document.querySelector("#login-email").value;
+
+        const password =
+        document.querySelector("#login-password").value;
+
+        const savedUser =
+        JSON.parse(localStorage.getItem("evUser"));
+
+        if(!savedUser){
+
+            alert("No account found!");
+
+            return;
+        }
+
+        if(
+            email === savedUser.email &&
+            password === savedUser.password
+        ){
+
+            localStorage.setItem(
+                "loggedInUser",
+                savedUser.name
+            );
+
+            alert("Login Successful!");
+
+            window.location.href = "../index.html";
+
+        }
+        else{
+
+            alert("Invalid Email or Password!");
+        }
+
+    });
+
+}

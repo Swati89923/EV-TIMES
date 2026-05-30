@@ -185,6 +185,17 @@ if(accountBtn && loggedInUser){
 
     accountBtn.innerHTML = `
         <span class="user-icon">👤</span>
-        ${loggedInUser}
+        ${loggedInUser} | Logout
     `;
+
+    accountBtn.addEventListener("click",(e)=>{
+
+        e.preventDefault();
+
+        localStorage.removeItem("loggedInUser");
+
+        window.location.reload();
+
+    });
+
 }
