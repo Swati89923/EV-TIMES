@@ -46,7 +46,7 @@
             The Future Of <br>
             EV Intelligence
         </h1>
-
+        <p class="welcome-user"></p>
         <p>
             Your one-stop platform for EV news,
             charging updates, AI insights and policies.
@@ -76,13 +76,17 @@
 
     <div class="search-box">
 
-        <input 
-            type="text"
-            placeholder="Search EV news..."
-            class="search-input"
-        >
+    <input
+        type="text"
+        placeholder="Search EV news..."
+        class="search-input"
+    >
 
-    </div>
+</div>
+
+<button class="refresh-btn">
+    Refresh News
+</button>
     <div class="filter-buttons">
 
     <button class="filter-btn active">
@@ -102,7 +106,9 @@
     </button>
 
 </div>
-
+    <div class="loader">
+    Loading EV News...
+</div>
     <div class="news-container container">
 
     </div>
@@ -139,7 +145,7 @@
     </div>
 
 </section>
-<div class="modal">
+<!-- <div class="modal">
 
     <div class="modal-content">
 
@@ -153,7 +159,7 @@
 
     </div>
 
-</div>
+</div> -->
 <script src="./js/app.js"></script>
 
 </body>

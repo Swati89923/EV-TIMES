@@ -1,3 +1,8 @@
+const API_KEY = "e4dcc7c5352f4e70a65b343d7bbeab5a";
+
+const API_URL =
+`https://newsapi.org/v2/everything?q=electric vehicle&language=en&pageSize=10&apiKey=${API_KEY}`;
+let allArticles = [];
 const newsData = [
 
     {
@@ -25,71 +30,161 @@ const newsData = [
     }
 
 ];
+async function fetchNews(){
 
-const newsContainer = document.querySelector(".news-container");
+    try{
 
-newsData.forEach((news,index)=>{
+        const response =
+        await fetch(API_URL);
+
+        const data =
+        await response.json();
+
+        allArticles = data.articles;
+
+        displayNews(data.articles);
+
+    }
+
+  catch(error){
+
+    console.log(error);
+
+    const newsContainer =
+    document.querySelector(".news-container");
+
+    newsContainer.innerHTML = `
+        <h2 class="no-news">
+            Unable to load EV News 😔
+        </h2>
+    `;
+}
+}
+function displayNews(articles){
     
-    newsContainer.innerHTML += `
+    loader.style.display = "none";
+    const newsContainer =
+    document.querySelector(".news-container");
 
-        <div class="news-card ${index > 1 ? 'hidden-card' : ''}">
+    newsContainer.innerHTML = "";
+    if(articles.length === 0){
 
-            <img src="${news.image}" alt="EV News">
+    newsContainer.innerHTML = `
+        <h2 class="no-news">
+            No News Found 😔
+        </h2>
+    `;
 
-          <div class="news-content">
+    return;
+}
 
-    <h3>${news.title}</h3>
+    articles.forEach((news)=>{
 
-    <p class="news-category">
-        ${news.category}
-    </p>
+        const formattedDate =
+        new Date(news.publishedAt)
+        .toLocaleDateString();
 
-    <span class="news-date">
-        ${news.date}
-    </span>
+        newsContainer.innerHTML += `
 
- <button 
+            <div class="news-card">
+
+                <img
+                   src="${news.urlToImage || 'https://via.placeholder.com/400x250'}"
+                    alt="EV News"
+                >
+
+                <div class="news-content">
+
+                    <h3>
+                        ${news.title}
+                    </h3>
+
+                    <p class="news-category">
+                        EV News
+                    </p>
+
+                    <span class="news-date">
+                        ${formattedDate}
+                    </span>
+
+                    <button
     class="read-more-btn"
-    data-title="${news.title}"
-    data-description="${news.description}"
-    data-image="${news.image}"
+    onclick="window.open('${news.url}','_blank')"
 >
     Read More
 </button>
+                </div>
 
-</div>
+            </div>
 
-        </div>
+        `;
+    });
 
-    `;
-});
+}
+// const newsContainer = document.querySelector(".news-container");
 
-const searchInput = document.querySelector(".search-input");
+// newsData.forEach((news,index)=>{
+    
+//     newsContainer.innerHTML += `
 
-searchInput.addEventListener("keyup", ()=>{
+//         <div class="news-card ${index > 1 ? 'hidden-card' : ''}">
 
-    const searchText = searchInput.value.toLowerCase();
+//             <img src="${news.image}" alt="EV News">
 
-    const newsCards = document.querySelectorAll(".news-card");
+//           <div class="news-content">
 
-    newsCards.forEach((card)=>{
+//     <h3>${news.title}</h3>
 
-        const title = card.querySelector("h3").innerText.toLowerCase();
+//     <p class="news-category">
+//         ${news.category}
+//     </p>
 
-        if(title.includes(searchText)){
+//     <span class="news-date">
+//         ${news.date}
+//     </span>
 
-            card.style.display = "block";
-        }
+//  <button 
+//     class="read-more-btn"
+//     data-title="${news.title}"
+//     data-description="${news.description}"
+//     data-image="${news.image}"
+// >
+//     Read More
+// </button>
 
-        else{
+// </div>
 
-            card.style.display = "none";
-        }
+//         </div>
+
+//     `;
+// });
+
+const loader =
+document.querySelector(".loader");
+
+const searchInput =
+document.querySelector(".search-input");
+
+searchInput.addEventListener("keyup",()=>{
+
+    const searchText =
+    searchInput.value.toLowerCase();
+
+    const filteredArticles =
+    allArticles.filter((news)=>{
+
+       return news.title &&
+          news.title
+          .toLowerCase()
+          .includes(searchText);
 
     });
 
-});
+    displayNews(filteredArticles);
 
+});
+const refreshBtn =
+document.querySelector(".refresh-btn");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 filterButtons.forEach((button)=>{
@@ -128,52 +223,52 @@ filterButtons.forEach((button)=>{
 
 });
 
-const loadMoreBtn = document.querySelector(".load-more-btn");
+// const loadMoreBtn = document.querySelector(".load-more-btn");
 
-loadMoreBtn.addEventListener("click", ()=>{
+// loadMoreBtn.addEventListener("click", ()=>{
 
-    const hiddenCards = document.querySelectorAll(".hidden-card");
+//     const hiddenCards = document.querySelectorAll(".hidden-card");
 
-    hiddenCards.forEach((card)=>{
+//     hiddenCards.forEach((card)=>{
 
-        card.style.display = "block";
-    });
+//         card.style.display = "block";
+//     });
 
-    loadMoreBtn.style.display = "none";
+//     loadMoreBtn.style.display = "none";
 
-});
+// });
 
-const modal = document.querySelector(".modal");
+// const modal = document.querySelector(".modal");
 
-const modalTitle = document.querySelector(".modal-title");
+// const modalTitle = document.querySelector(".modal-title");
 
-const modalDescription = document.querySelector(".modal-description");
+// const modalDescription = document.querySelector(".modal-description");
 
-const modalImage = document.querySelector(".modal-image");
+// const modalImage = document.querySelector(".modal-image");
 
-const closeModal = document.querySelector(".close-modal");
+// const closeModal = document.querySelector(".close-modal");
 
-document.addEventListener("click",(e)=>{
+// document.addEventListener("click",(e)=>{
 
-    if(e.target.classList.contains("read-more-btn")){
+//     if(e.target.classList.contains("read-more-btn")){
 
-        modal.style.display = "flex";
+//         modal.style.display = "flex";
 
-        modalTitle.innerText =
-        e.target.dataset.title;
+//         modalTitle.innerText =
+//         e.target.dataset.title;
 
-        modalDescription.innerText =
-        e.target.dataset.description;
+//         modalDescription.innerText =
+//         e.target.dataset.description;
 
-        modalImage.src =
-        e.target.dataset.image;
-    }
-});
+//         modalImage.src =
+//         e.target.dataset.image;
+//     }
+// });
 
-closeModal.addEventListener("click",()=>{
+// closeModal.addEventListener("click",()=>{
 
-    modal.style.display = "none";
-});
+//     modal.style.display = "none";
+// });
 
 const accountBtn =
 document.querySelector("#account-btn");
@@ -181,7 +276,23 @@ document.querySelector("#account-btn");
 const loggedInUser =
 localStorage.getItem("loggedInUser");
 
-if(accountBtn && loggedInUser){
+const welcomeUser =
+document.querySelector(".welcome-user");
+
+if(welcomeUser && loggedInUser){
+
+    welcomeUser.innerText =
+    `Welcome Back, ${loggedInUser} 👋`;
+
+}
+
+if(!loggedInUser){
+
+    window.location.href =
+    "./pages/login.html";
+
+}
+else{
 
     accountBtn.innerHTML = `
         <span class="user-icon">👤</span>
@@ -199,3 +310,16 @@ if(accountBtn && loggedInUser){
     });
 
 }
+if(refreshBtn){
+
+    refreshBtn.addEventListener("click",()=>{
+
+        loader.style.display = "block";
+
+        fetchNews();
+
+    });
+
+}
+
+fetchNews();
