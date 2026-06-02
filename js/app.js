@@ -142,6 +142,50 @@ function displayNews(articles){
         `;
     });
 
+
+const adminNews =
+JSON.parse(
+    localStorage.getItem("adminNews")
+) || [];
+
+adminNews.forEach((news)=>{
+
+    newsContainer.innerHTML += `
+
+        <div class="news-card">
+
+            <img
+                src="${news.image}"
+                alt="Admin News"
+            >
+
+            <div class="news-content">
+
+                <h3>
+                    ${news.title}
+                </h3>
+
+                <p class="news-category">
+                    ${news.category}
+                </p>
+
+                <span class="news-date">
+                    Admin News
+                </span>
+
+                <button
+                    class="read-more-btn"
+                >
+                    Read More
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+});
 }
 // const newsContainer = document.querySelector(".news-container");
 
@@ -343,13 +387,9 @@ if(refreshBtn){
 
     fetchNews();
 
-    toast.style.display = "block";
-
-    setTimeout(()=>{
-
-        toast.style.display = "none";
-
-    },2000);
+    showToast(
+    "News Refreshed Successfully ✅"
+);
 
 });
 
@@ -367,19 +407,155 @@ document.addEventListener("click",(e)=>{
         };
 
         let bookmarks =
-        JSON.parse(localStorage.getItem("bookmarks")) || [];
+JSON.parse(localStorage.getItem("bookmarks")) || [];
 
-        bookmarks.push(article);
+const alreadyExists = bookmarks.some(
+    (item)=> item.url === article.url
+);
 
-        localStorage.setItem(
-            "bookmarks",
-            JSON.stringify(bookmarks)
-        );
+if(alreadyExists){
 
-        alert("News Bookmarked ✅");
+    showToast(
+        "Already Bookmarked ⚠️"
+    );
 
+    return;
+}
+
+bookmarks.push(article);
+
+localStorage.setItem(
+    "bookmarks",
+    JSON.stringify(bookmarks)
+);
+
+
+  console.log("Toast Called");
+        showToast(
+    "News Bookmarked ✅"
+);
     }
 
 });
 
 fetchNews();
+function showToast(message){
+
+    const toast =
+    document.querySelector(".toast");
+
+    toast.innerHTML = message;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+
+        toast.classList.remove("show");
+
+    },3000);
+
+}
+
+function animateCounter(id, target, suffix = ""){
+
+    const element =
+    document.getElementById(id);
+
+    let count = 0;
+
+    const increment =
+    target / 100;
+
+    const timer = setInterval(()=>{
+
+        count += increment;
+
+        if(count >= target){
+
+            element.innerHTML =
+            target + suffix;
+
+            clearInterval(timer);
+
+            return;
+        }
+
+        element.innerHTML =
+        Math.floor(count) + suffix;
+
+    },20);
+
+}
+animateCounter(
+    "ev-count",
+    38,
+    "M+"
+);
+
+animateCounter(
+    "station-count",
+    3.2,
+    "M"
+);
+
+animateCounter(
+    "market-count",
+    14,
+    "%"
+);
+
+animateCounter(
+    "value-count",
+    847,
+    "B"
+);
+
+const themeBtn =
+document.querySelector("#theme-toggle");
+
+if(themeBtn){
+
+    themeBtn.addEventListener("click",()=>{
+
+        document.body.classList.toggle(
+            "light-theme"
+        );
+
+        if(
+            document.body.classList.contains(
+                "light-theme"
+            )
+        ){
+
+            localStorage.setItem(
+                "theme",
+                "light"
+            );
+
+            themeBtn.innerHTML = "☀️";
+        }
+
+        else{
+
+            localStorage.setItem(
+                "theme",
+                "dark"
+            );
+
+            themeBtn.innerHTML = "🌙";
+        }
+
+    });
+
+}
+const savedTheme =
+localStorage.getItem("theme");
+
+if(savedTheme === "light"){
+
+    document.body.classList.add(
+        "light-theme"
+    );
+
+    themeBtn.innerHTML = "☀️";
+}

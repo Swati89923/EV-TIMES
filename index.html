@@ -20,15 +20,41 @@
     <h1 class="logo">EVTIMES</h1>
 
     <ul class="nav-links">
-        <li>Home</li>
-        <li>News</li>
-        <li>AI</li>
-        <li>About</li>
+        <li>
+    <a href="./index.html">
+        Home
+    </a>
+</li>
+       <li>
+    <a href="#news-section">
+        News
+    </a>
+</li>
+        <li><a href="./pages/admin.html">Admin</a></li>
+        <li>
+    <a href="./pages/ai.html">
+        AI
+    </a>
+</li>
+        <li>
+    <a href="./pages/about.html">
+        About
+    </a>
+</li>
         <li>
     <a href="./pages/bookmarks.html">
         Bookmarks
     </a>
      </li>
+     
+     <li>
+    <a href="./pages/profile.html">
+        Profile
+    </a>
+</li>
+<button id="theme-toggle">
+    🌙
+</button>
         <a href="./pages/login.html"
            class="auth-btn"
            id="account-btn">
@@ -72,7 +98,10 @@
 
 </section>
 
-<section class="news-section">
+<section
+    class="news-section"
+    id="news-section"
+>
 
     <h2 class="section-title">
         Trending EV News
@@ -129,22 +158,22 @@
 <section class="stats-section">
 
     <div class="stat-box">
-        <h2>38M+</h2>
+        <h2 id="ev-count">0</h2>
         <p>EVs Worldwide</p>
     </div>
 
     <div class="stat-box">
-        <h2>3.2M</h2>
+        <h2 id="station-count">0</h2>
         <p>Charging Stations</p>
     </div>
 
     <div class="stat-box">
-        <h2>14%</h2>
+        <h2 id="market-count">0</h2>
         <p>Market Share</p>
     </div>
 
     <div class="stat-box">
-        <h2>$847B</h2>
+        <h2 id="value-count">0</h2>
         <p>EV Industry Value</p>
     </div>
 
@@ -163,10 +192,11 @@
 
     </div>
 
-</div> -->
+-->
 <div class="toast">
-    News Refreshed Successfully ✅
+    Bookmarked Successfully ✅
 </div>
+
 <script src="./js/app.js"></script>
 
 </body>

@@ -4,15 +4,6 @@ JSON.parse(localStorage.getItem("bookmarks")) || [];
 const container =
 document.querySelector(".bookmarks-container");
 
-const alreadyExists = bookmarks.some(
-    (item) => item.url === news.url
-);
-
-if(alreadyExists){
-    alert("Already Bookmarked!");
-    return;
-}
-
 if(bookmarks.length === 0){
 
     container.innerHTML = `
@@ -48,7 +39,12 @@ else{
                         Read More
                     </button>
                     
-
+                    <button
+                      class="remove-btn"
+                           data-url="${news.url}"
+                                  >
+                                   Remove
+                                   </button>
                 </div>
 
             </div>
@@ -57,3 +53,28 @@ else{
     });
 
 }
+const removeButtons =
+document.querySelectorAll(".remove-btn");
+
+removeButtons.forEach((button)=>{
+
+    button.addEventListener("click",()=>{
+
+        const url =
+        button.dataset.url;
+
+        const updatedBookmarks =
+        bookmarks.filter(
+            (item)=> item.url !== url
+        );
+
+        localStorage.setItem(
+            "bookmarks",
+            JSON.stringify(updatedBookmarks)
+        );
+
+        location.reload();
+
+    });
+
+});
