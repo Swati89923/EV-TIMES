@@ -30,7 +30,13 @@ const newsData = [
     }
 
 ];
+
 async function fetchNews(){
+
+    const loader =
+    document.querySelector(".loader");
+
+    loader.style.display = "block";
 
     try{
 
@@ -44,11 +50,15 @@ async function fetchNews(){
 
         displayNews(data.articles);
 
+        loader.style.display = "none";
+
     }
 
   catch(error){
 
     console.log(error);
+
+    loader.style.display = "none";
 
     const newsContainer =
     document.querySelector(".news-container");
@@ -61,8 +71,12 @@ async function fetchNews(){
 }
 }
 function displayNews(articles){
-    
+
+    const loader =
+    document.querySelector(".loader");
+
     loader.style.display = "none";
+
     const newsContainer =
     document.querySelector(".news-container");
 
@@ -112,6 +126,14 @@ function displayNews(articles){
     onclick="window.open('${news.url}','_blank')"
 >
     Read More
+</button>
+<button
+    class="bookmark-btn"
+    data-title="${news.title}"
+    data-image="${news.urlToImage}"
+    data-url="${news.url}"
+>
+    🔖 Bookmark
 </button>
                 </div>
 
@@ -183,6 +205,8 @@ searchInput.addEventListener("keyup",()=>{
     displayNews(filteredArticles);
 
 });
+
+
 const refreshBtn =
 document.querySelector(".refresh-btn");
 const filterButtons = document.querySelectorAll(".filter-btn");
@@ -310,16 +334,52 @@ else{
     });
 
 }
+
+const toast =
+document.querySelector(".toast");
 if(refreshBtn){
 
     refreshBtn.addEventListener("click",()=>{
 
-        loader.style.display = "block";
+    fetchNews();
 
-        fetchNews();
+    toast.style.display = "block";
 
-    });
+    setTimeout(()=>{
+
+        toast.style.display = "none";
+
+    },2000);
+
+});
 
 }
+document.addEventListener("click",(e)=>{
+
+    if(e.target.classList.contains("bookmark-btn")){
+
+        const article = {
+
+            title: e.target.dataset.title,
+            image: e.target.dataset.image,
+            url: e.target.dataset.url
+
+        };
+
+        let bookmarks =
+        JSON.parse(localStorage.getItem("bookmarks")) || [];
+
+        bookmarks.push(article);
+
+        localStorage.setItem(
+            "bookmarks",
+            JSON.stringify(bookmarks)
+        );
+
+        alert("News Bookmarked ✅");
+
+    }
+
+});
 
 fetchNews();
