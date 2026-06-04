@@ -21,4 +21,8 @@ public class NewsService {
     public List<News> getAllNews() {
         return newsRepository.findAll();
     }
+
+    public News createNews(News news) {
+        return newsRepository.save(news);
+    }
 }

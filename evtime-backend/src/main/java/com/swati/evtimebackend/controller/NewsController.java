@@ -4,6 +4,8 @@ import com.swati.evtimebackend.entity.News;
 import com.swati.evtimebackend.service.NewsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -19,5 +21,10 @@ public class NewsController {
     @GetMapping("/news")
     public List<News> getAllNews() {
         return newsService.getAllNews();
+    }
+
+    @PostMapping("/news")
+    public News createNews(@RequestBody News news) {
+        return newsService.createNews(news);
     }
 }
