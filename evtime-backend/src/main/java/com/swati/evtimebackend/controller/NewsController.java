@@ -25,7 +25,7 @@ public class NewsController {
         return newsService.getAllNews();
     }
 
-    @PostMapping("/news")
+    @PostMapping("/news/create")
     public News createNews(@Valid @RequestBody News news) {
         return newsService.createNews(news);
     }
@@ -34,11 +34,11 @@ public class NewsController {
     public Optional<News>  getNewsById(@PathVariable long id){
         return newsService.getNewsById(id);
     }
-    @PutMapping("/news/{id}")
+    @PutMapping("/news/update/{id}")
     public News updateNews(@PathVariable Long id,@RequestBody News news){
         return newsService.updateNews(id, news);
     }
-    @DeleteMapping("/news/{id}")
+    @DeleteMapping("/news/delete/{id}")
     public String deleteNews(@PathVariable Long id){
         newsService.deleteNews(id);
         return "News deleted successfully";
