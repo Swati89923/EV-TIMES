@@ -36,8 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/news",
                                 "/news/*"
-                        ).hasAnyRole("USER", "ADMIN")
-
+                        ).permitAll()
                         .requestMatchers(
                                 "/news/create",
                                 "/news/update/**",

@@ -7,12 +7,14 @@ import java.util.Optional;
 import com.swati.evtimebackend.security.JwtUtil;
 import com.swati.evtimebackend.dto.UserResponseDTO;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
+
     public UserService(
             UserRepository userRepository,
             JwtUtil jwtUtil,
@@ -27,6 +29,10 @@ public class UserService {
 
         user.setRole("USER");
 
+        user.setPassword(
+                passwordEncoder.encode(user.getPassword())
+        );
+
         return userRepository.save(user);
     }
 
@@ -35,7 +41,10 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if(user.isPresent() &&
-                user.get().getPassword().equals(password)){
+                passwordEncoder.matches(
+                        password,
+                        user.get().getPassword()
+                )){
 
             String token =
                     jwtUtil.generateToken(
