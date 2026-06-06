@@ -6,7 +6,13 @@ import java.util.List;
 public interface NewsRepository
         extends JpaRepository<News, Long> {
 
-    List<News> findByTitleContainingIgnoreCase(
+    List<News> findByTitleContainingIgnoreCase(String keyword);
+
+    List<News> findByCategoryIgnoreCase(String category);
+    List<News> findByCategoryAndTitleContainingIgnoreCase(
+            String category,
             String keyword
     );
 }
+
+

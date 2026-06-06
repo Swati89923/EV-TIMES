@@ -15,10 +15,13 @@ public class SecurityConfig {
     public SecurityConfig(JwtFilter jwtFilter){
         this.jwtFilter = jwtFilter;
     }
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
@@ -27,29 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers(
-                                "/signup",
-                                "/login"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                "/news",
-                                "/news/*"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/news/create",
-                                "/news/update/**",
-                                "/news/delete/**"
-                        ).hasRole("ADMIN")
-
-                        .anyRequest()
-                        .authenticated()
-                )
-
-                .addFilterBefore(
-                        jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

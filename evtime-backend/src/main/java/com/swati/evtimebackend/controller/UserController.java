@@ -3,6 +3,7 @@ package com.swati.evtimebackend.controller;
 import com.swati.evtimebackend.dto.UserResponseDTO;
 import com.swati.evtimebackend.entity.User;
 import com.swati.evtimebackend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +16,8 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public UserResponseDTO signup(@RequestBody User user){
+    public UserResponseDTO signup(
+            @Valid @RequestBody User user){
 
         User savedUser = userService.registerUser(user);
 

@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
-
+import com.swati.evtimebackend.exception.ResourceNotFoundException;
 @Service
 public class NewsService {
 
@@ -44,17 +44,37 @@ public class NewsService {
     }
 
     // get by id ka func
-    public Optional<News> getNewsById(Long id) {
-        return newsRepository.findById(id);
+    public News getNewsById(Long id) {
+
+        return newsRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "News not found with id " + id
+                        )
+                );
     }
     public void deleteNews(Long id) {
-        newsRepository.deleteById(id);
+
+        News news = newsRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "News not found with id " + id
+                        )
+                );
+
+        newsRepository.delete(news);
     }
 
     // Update ke liye
     public News updateNews(Long id, News updatedNews) {
 
-        News news = newsRepository.findById(id).orElse(null);
+        News news =
+                newsRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "News not found with id " + id
+                                )
+                        );
 
         if (news != null) {
             news.setTitle(updatedNews.getTitle());
@@ -68,7 +88,24 @@ public class NewsService {
 
         return null;
     }
+    public List<News> getNewsByCategory(
+            String category){
+
+        return newsRepository
+                .findByCategoryIgnoreCase(category);
+    }
     public List<News> searchNews(String keyword) {
         return newsRepository.findByTitleContainingIgnoreCase(keyword);
     }
+    public List<News> filterNews(
+            String category,
+            String keyword) {
+
+        return newsRepository
+                .findByCategoryAndTitleContainingIgnoreCase(
+                        category,
+                        keyword
+                );
+    }
+
 }

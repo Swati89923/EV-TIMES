@@ -49,7 +49,7 @@ public class NewsController {
     }
 
     @GetMapping("/news/{id}")
-    public Optional<News> getNewsById(
+    public News getNewsById(
             @PathVariable Long id) {
 
         return newsService.getNewsById(id);
@@ -71,4 +71,24 @@ public class NewsController {
 
         return "News deleted successfully";
     }
+    @GetMapping("/news/category/{category}")
+    public List<News> getNewsByCategory(
+            @PathVariable String category){
+
+        return newsService
+                .getNewsByCategory(category);
+    }
+    @GetMapping("/news/filter")
+    public List<News> filterNews(
+
+            @RequestParam String category,
+
+            @RequestParam String keyword) {
+
+        return newsService.filterNews(
+                category,
+                keyword
+        );
+    }
+
 }
