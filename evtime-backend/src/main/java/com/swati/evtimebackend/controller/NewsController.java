@@ -86,8 +86,8 @@ public class NewsController {
             @RequestParam String keyword) {
 
         return newsService.filterNews(
-                category,
-                keyword
+                category, keyword
+                
         );
     }
 
