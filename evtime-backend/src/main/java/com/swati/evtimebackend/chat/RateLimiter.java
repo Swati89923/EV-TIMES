@@ -1,23 +1,17 @@
 package com.swati.evtimebackend.chat;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Small in-memory sliding-window limiter, one window per client key (IP). */
-@Component
 public class RateLimiter {
 
     private final int maxRequests;
     private final long windowMillis;
     private final ConcurrentHashMap<String, Deque<Long>> hits = new ConcurrentHashMap<>();
 
-    public RateLimiter(
-            @Value("${app.chat.rate-limit:20}") int maxRequests,
-            @Value("${app.chat.window-seconds:600}") long windowSeconds) {
+    public RateLimiter(int maxRequests, long windowSeconds) {
         this.maxRequests = maxRequests;
         this.windowMillis = windowSeconds * 1000;
     }
