@@ -114,6 +114,15 @@ cd evtime-frontend && npm run lint && npm run build
 3. **Frontend** – deploy `evtime-frontend` to Vercel or Netlify (build `npm run build`, output `dist`) with `VITE_API_URL=https://<your-api>/api`.
 4. Set `CORS_ALLOWED_ORIGINS` on the backend to the frontend URL.
 
+## Live deployment
+
+| Part | Host | URL |
+|------|------|-----|
+| Frontend | Vercel (project `evtimes`) | https://evtimes.vercel.app |
+| API + MySQL | Railway (project `evtimes`) | https://api-production-3f76d453.up.railway.app |
+
+Backend variables live in the Railway service (`api`); the frontend needs `VITE_API_URL` in Vercel. Deploy manually with `railway up` from `evtime-backend` and `vercel deploy --prod` from `evtime-frontend`, or connect the GitHub repository in each dashboard (set the root directory to `evtime-backend` / `evtime-frontend`) for automatic deploys on every merge.
+
 ## Before you publish
 
 - [ ] Strong `JWT_SECRET`, new database password, `ADMIN_PASSWORD` changed from the development default
