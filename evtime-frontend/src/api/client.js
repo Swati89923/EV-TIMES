@@ -1,6 +1,8 @@
 import axios from 'axios'
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+/** API origin without the trailing /api (the backend serves share pages from here). */
+export const API_ORIGIN = API_URL.replace(/\/+$/, '').replace(/\/api$/, '')
 export const TOKEN_KEY = 'evtimes-auth'
 
 const client = axios.create({ baseURL: API_URL, timeout: 15000 })
