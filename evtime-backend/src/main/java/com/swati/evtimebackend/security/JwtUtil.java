@@ -1,66 +1,67 @@
 package com.swati.evtimebackend.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY =
-            "swatievtimesprojectjwtsecretkeyforauthentication123456789";
+    private final SecretKey key;
+    private final long expirationMs;
+
+    public JwtUtil(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.expiration-ms}") long expirationMs) {
+
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException(
+                    "JWT_SECRET must be set and at least 32 characters long");
+        }
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationMs = expirationMs;
+    }
 
     public String generateToken(String email, String role) {
-
+        Date now = new Date();
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis()
-                                + 1000 * 60 * 60)
-                )
-                .signWith(
-                        SignatureAlgorithm.HS256,
-                        SECRET_KEY
-                )
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expirationMs))
+                .signWith(key)
                 .compact();
     }
 
     public String extractEmail(String token) {
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getSubject();
+        return parse(token).getSubject();
     }
+
     public String extractRole(String token) {
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.get("role", String.class);
+        return parse(token).get("role", String.class);
     }
+
     public boolean validateToken(String token) {
-
         try {
-
-            Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token);
-
+            parse(token);
             return true;
-
-        } catch (Exception e) {
-
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private Claims parse(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

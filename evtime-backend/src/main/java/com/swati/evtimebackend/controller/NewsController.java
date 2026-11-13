@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/news")
 public class NewsController {
 
     private final NewsService newsService;
@@ -18,7 +19,7 @@ public class NewsController {
         this.newsService = newsService;
     }
 
-    @GetMapping("/news")
+    @GetMapping
     public Page<News> getAllNews(
 
             @RequestParam(defaultValue = "0") int page,
@@ -34,28 +35,28 @@ public class NewsController {
         );
     }
 
-    @GetMapping("/news/search")
+    @GetMapping("/search")
     public List<News> searchNews(
             @RequestParam String keyword) {
 
         return newsService.searchNews(keyword);
     }
 
-    @PostMapping("/news/create")
+    @PostMapping
     public News createNews(
             @Valid @RequestBody News news) {
 
         return newsService.createNews(news);
     }
 
-    @GetMapping("/news/{id}")
+    @GetMapping("/{id}")
     public News getNewsById(
             @PathVariable Long id) {
 
         return newsService.getNewsById(id);
     }
 
-    @PutMapping("/news/update/{id}")
+    @PutMapping("/{id}")
     public News updateNews(
             @PathVariable Long id,
             @RequestBody News news) {
@@ -63,7 +64,7 @@ public class NewsController {
         return newsService.updateNews(id, news);
     }
 
-    @DeleteMapping("/news/delete/{id}")
+    @DeleteMapping("/{id}")
     public String deleteNews(
             @PathVariable Long id) {
 
@@ -71,14 +72,14 @@ public class NewsController {
 
         return "News deleted successfully";
     }
-    @GetMapping("/news/category/{category}")
+    @GetMapping("/category/{category}")
     public List<News> getNewsByCategory(
             @PathVariable String category){
 
         return newsService
                 .getNewsByCategory(category);
     }
-    @GetMapping("/news/filter")
+    @GetMapping("/filter")
     public List<News> filterNews(
 
             @RequestParam String category,
