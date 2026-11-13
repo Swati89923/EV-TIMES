@@ -5,7 +5,6 @@ import { ArrowRight, Flame, Rss } from 'lucide-react'
 import { getCategories, getFeatured, getNews, getTrending } from '../api/news'
 import ArticleCard from '../components/ArticleCard'
 import Feed from '../components/Feed'
-import Newsletter from '../components/Newsletter'
 import { ErrorState, LiveBadge, SectionHeading, Skeleton } from '../components/ui'
 import { SOURCES } from '../utils/sources'
 import { categoryPath } from '../utils/format'
@@ -146,7 +145,6 @@ export default function Home() {
         <Sidebar trending={trending} categories={categories} />
       </div>
 
-      <Newsletter />
     </div>
   )
 }
