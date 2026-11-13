@@ -66,7 +66,23 @@ export default function Article() {
   const { id } = useParams()
   const { data: news, isLoading, isError, error, refetch } = useQuery({ queryKey: ['news', id], queryFn: () => getNewsById(id), retry: false })
   const related = useQuery({ queryKey: ['related', id], queryFn: () => getRelated(id), enabled: !!news })
-  useDocumentTitle(news?.title, news?.description)
+  useDocumentTitle(news?.title, news?.description, news && {
+    image: news.imageUrl || undefined,
+    type: 'article',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: news.title,
+      description: news.description,
+      image: news.imageUrl ? [news.imageUrl] : undefined,
+      datePublished: news.createdAt,
+      dateModified: news.updatedAt || news.createdAt,
+      articleSection: news.category,
+      author: { '@type': news.external ? 'Organization' : 'Person', name: news.external ? news.sourceName || 'EV Times' : news.author || 'EV Times Desk' },
+      publisher: { '@type': 'Organization', name: 'EV Times', logo: { '@type': 'ImageObject', url: `${window.location.origin}/icon-512.png` } },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+    },
+  })
 
   if (isLoading) {
     return (

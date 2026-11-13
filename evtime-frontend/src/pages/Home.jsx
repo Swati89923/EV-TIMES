@@ -90,7 +90,15 @@ function Sidebar({ trending, categories }) {
 }
 
 export default function Home() {
-  useDocumentTitle(null, 'Breaking electric vehicle news, analysis and reviews from EV Times.')
+  useDocumentTitle(null, 'Breaking electric vehicle news, analysis and reviews from EV Times.', {
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'EV Times',
+      url: window.location.origin,
+      potentialAction: { '@type': 'SearchAction', target: `${window.location.origin}/search?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+    },
+  })
 
   const featured = useQuery({ queryKey: ['featured'], queryFn: getFeatured, refetchInterval: 120000 })
   const trending = useQuery({ queryKey: ['trending'], queryFn: getTrending })
