@@ -71,6 +71,9 @@ All backend settings are environment variables; nothing secret lives in the repo
 | `PUBLIC_BASE_URL` | optional | Public API URL used in uploaded image links |
 | `UPLOAD_DIR` | optional | Where images are stored (default `uploads`) |
 | `PORT` | optional | HTTP port (default `8080`) |
+| `AI_BASE_URL` | optional | OpenAI-compatible chat API for the assistant, e.g. `http://localhost:11434/v1` (Ollama), `https://api.groq.com/openai/v1`. Empty = built-in answers only |
+| `AI_API_KEY` / `AI_MODEL` | optional | Key (not needed for Ollama) and model name |
+| `FEEDS_ENABLED` / `FEED_SOURCES` | optional | Live news import on/off and feed list (`Name\|https://feed,...`) |
 
 Frontend: `VITE_API_URL` – base URL of the API including `/api`.
 
@@ -84,6 +87,9 @@ Frontend: `VITE_API_URL` – base URL of the API including `/api`.
 | POST / PUT / DELETE | `/api/news`, `/api/news/{id}` | `ADMIN`, `EDITOR` |
 | POST | `/api/uploads` (multipart `file`) | `ADMIN`, `EDITOR` |
 | GET / POST / DELETE | `/api/bookmarks`, `/api/bookmarks/{newsId}` | logged in |
+| POST | `/api/chat` | public, rate limited |
+| POST | `/api/admin/feeds/refresh` | `ADMIN` |
+| GET | `/api/news/latest?since=` | public |
 | GET | `/actuator/health` | public |
 
 Errors are JSON: `{ "status": 400, "message": "...", "errors": { "field": "..." } }`.
