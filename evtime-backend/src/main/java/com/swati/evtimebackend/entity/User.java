@@ -32,6 +32,14 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;
 
+    /** LOCAL (email + password) or GOOGLE; null on rows created before this field existed. */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    @Column(length = 500)
+    private String pictureUrl;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 }

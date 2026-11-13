@@ -3,7 +3,9 @@ package com.swati.evtimebackend.service;
 import com.swati.evtimebackend.dto.AuthResponse;
 import com.swati.evtimebackend.dto.LoginRequest;
 import com.swati.evtimebackend.dto.SignupRequest;
+import com.swati.evtimebackend.entity.AuthProvider;
 import com.swati.evtimebackend.entity.Role;
+import com.swati.evtimebackend.security.GoogleIdentity;
 import com.swati.evtimebackend.entity.User;
 import com.swati.evtimebackend.exception.ApiException;
 import com.swati.evtimebackend.repository.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -61,6 +64,33 @@ public class AuthService {
         return toResponse(user);
     }
 
+    /** Signs in with a verified Google identity, creating or linking the account as needed. */
+    public AuthResponse googleLogin(GoogleIdentity identity) {
+        String email = normalize(identity.email());
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setName(identity.name() == null || identity.name().isBlank()
+                    ? email.substring(0, email.indexOf('@')) : identity.name().trim());
+            // Google users never type a password; store an unusable random one
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setRole(Role.USER);
+            user.setProvider(AuthProvider.GOOGLE);
+        }
+        if (user.getPictureUrl() == null && identity.picture() != null
+                && identity.picture().startsWith("https://")) {
+            user.setPictureUrl(identity.picture());
+        }
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException e) {
+            user = userRepository.findByEmail(email).orElseThrow(() -> e);
+        }
+        return toResponse(user);
+    }
+
     /** Creates an account with a specific role unless the email already exists. */
     public void createIfMissing(String name, String email, String rawPassword, Role role) {
         String normalized = normalize(email);
@@ -77,7 +107,7 @@ public class AuthService {
 
     private AuthResponse toResponse(User user) {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole());
+        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole(), user.getPictureUrl());
     }
 
     private static String normalize(String email) {
