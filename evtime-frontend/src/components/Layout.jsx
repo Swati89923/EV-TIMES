@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { categoryPath, formatDate } from '../utils/format'
 import Footer from './Footer'
+import { Avatar } from './ui'
 import { BackToTop, ScrollManager } from './ScrollManager'
 import ChatWidget from './ChatWidget'
 
@@ -74,7 +75,7 @@ function AccountMenu() {
         aria-label={`Account menu for ${user.name}`}
         className="flex items-center gap-1 rounded-full p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold uppercase text-white">{(user.name || user.email || '?').charAt(0)}</span>
+        <Avatar user={user} />
         <ChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence>

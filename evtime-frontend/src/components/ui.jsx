@@ -21,6 +21,16 @@ export function SmartImage({ src, alt, className = '', ...rest }) {
   )
 }
 
+/** Profile picture (Google accounts) with a coloured initial as fallback. */
+export function Avatar({ user, className = 'h-8 w-8 text-sm' }) {
+  const [failed, setFailed] = useState(false)
+  const initial = (user?.name || user?.email || '?').charAt(0).toUpperCase()
+  if (user?.picture && !failed) {
+    return <img src={user.picture} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} className={`rounded-full object-cover ${className}`} />
+  }
+  return <span aria-hidden="true" className={`flex items-center justify-center rounded-full bg-brand-600 font-bold text-white ${className}`}>{initial}</span>
+}
+
 /** Relative time that refreshes itself every minute. */
 export function TimeAgo({ iso }) {
   useNow()

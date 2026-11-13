@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getBookmarks } from '../api/news'
 import ArticleCard from '../components/ArticleCard'
-import { CardSkeleton, EmptyState, ErrorState } from '../components/ui'
+import { Avatar, CardSkeleton, EmptyState, ErrorState } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 
@@ -36,9 +36,7 @@ export function Profile() {
   return (
     <div className="mx-auto max-w-xl rounded-2xl border border-neutral-200 p-8 dark:border-neutral-800">
       <div className="flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500 text-2xl font-bold text-ink" aria-hidden="true">
-          {user.name?.[0]?.toUpperCase()}
-        </div>
+        <Avatar user={user} className="h-16 w-16 text-2xl" />
         <div>
           <h1 className="text-2xl font-extrabold">{user.name}</h1>
           <p className="text-sm text-neutral-500">{user.email}</p>

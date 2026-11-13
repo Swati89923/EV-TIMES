@@ -119,11 +119,11 @@ export function Privacy() {
   return (
     <Page eyebrow="Legal" title="Privacy Policy" intro="How EV Times handles information about you.">
       <H2>What we collect</H2>
-      <p>If you create an account we store your name, email address and a securely hashed password, plus the articles you bookmark. We do not collect payment information.</p>
+      <p>If you create an account we store your name, email address and a securely hashed password, plus the articles you bookmark. If you choose <strong>Continue with Google</strong>, Google tells us your name, verified email address and profile picture; we do not receive or store a Google password, and no password is needed for that account. We do not collect payment information.</p>
       <H2>How we use it</H2>
       <p>Your details are used only to run your account, keep you signed in and save your bookmarks. We do not sell personal data.</p>
       <H2>Cookies and storage</H2>
-      <p>We store your sign-in token and theme preference in your browser. See the <Link to="/cookies" className="font-semibold text-brand-700 underline dark:text-brand-400">Cookie Policy</Link>.</p>
+      <p>We store your sign-in token and theme preference in your browser (local storage only, so there is no cookie consent banner). We do not use advertising or cross-site tracking. If you use Google sign-in, Google&apos;s own policies apply to its sign-in window. See the <Link to="/cookies" className="font-semibold text-brand-700 underline dark:text-brand-400">Cookie Policy</Link>.</p>
       <H2>Your choices</H2>
       <p>You can sign out at any time to remove the token from your device. To ask for your data to be deleted, <Link to="/contact" className="font-semibold text-brand-700 underline dark:text-brand-400">contact us</Link>.</p>
     </Page>
