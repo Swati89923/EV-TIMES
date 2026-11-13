@@ -1,18 +1,41 @@
 import { useState } from 'react'
 import { AlertTriangle, ChevronLeft, ChevronRight, Inbox, X } from 'lucide-react'
-import { PLACEHOLDER_IMAGE } from '../utils/format'
+import { PLACEHOLDER_IMAGE, timeAgo } from '../utils/format'
+import useNow from '../hooks/useNow'
 
 export function SmartImage({ src, alt, className = '', ...rest }) {
-  const [failed, setFailed] = useState(false)
+  const [failedSrc, setFailedSrc] = useState(null)
+  const failed = !src || failedSrc === src
   return (
     <img
-      src={!src || failed ? PLACEHOLDER_IMAGE : src}
+      src={failed ? PLACEHOLDER_IMAGE : src}
       alt={alt}
       loading="lazy"
-      onError={() => setFailed(true)}
+      decoding="async"
+      referrerPolicy="no-referrer"
+      onError={() => setFailedSrc(src)}
       className={`bg-neutral-200 object-cover dark:bg-neutral-800 ${className}`}
       {...rest}
     />
+  )
+}
+
+/** Relative time that refreshes itself every minute. */
+export function TimeAgo({ iso }) {
+  useNow()
+  return <time dateTime={iso}>{timeAgo(iso)}</time>
+}
+
+/** Pulsing "LIVE" marker. */
+export function LiveBadge() {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600/10 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-red-600 dark:text-red-400" title="This feed updates automatically">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+      </span>
+      Live
+    </span>
   )
 }
 

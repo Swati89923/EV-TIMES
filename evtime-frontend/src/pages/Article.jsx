@@ -1,13 +1,13 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Clock, Eye, Link2 } from 'lucide-react'
+import { Clock, Eye, ExternalLink, Link2 } from 'lucide-react'
 import { getNewsById, getRelated } from '../api/news'
 import ArticleCard, { CategoryTag } from '../components/ArticleCard'
 import BookmarkButton from '../components/BookmarkButton'
 import { ErrorState, SectionHeading, SmartImage, Skeleton } from '../components/ui'
 import { useToast } from '../context/ToastContext'
 import useDocumentTitle from '../hooks/useDocumentTitle'
-import { formatDate, paragraphs, readTime } from '../utils/format'
+import { byline, formatDate, paragraphs, readTime } from '../utils/format'
 
 function ShareButtons({ title }) {
   const toast = useToast()
@@ -64,11 +64,11 @@ export default function Article() {
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-y border-neutral-200 py-3 text-sm dark:border-neutral-800">
         <div className="text-neutral-600 dark:text-neutral-400">
-          <span className="font-semibold text-neutral-900 dark:text-neutral-100">{news.author || 'EV Times Staff'}</span>
+          <span className="font-semibold text-neutral-900 dark:text-neutral-100">{byline(news) || 'EV Times Staff'}</span>
           <span className="mx-2">·</span>
           <time dateTime={news.createdAt}>{formatDate(news.createdAt, { year: 'numeric', month: 'long', day: 'numeric' })}</time>
           <span className="mx-2">·</span>
-          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {readTime(news.content)} min read</span>
+          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {readTime(news.content || news.description)} min read</span>
           <span className="mx-2">·</span>
           <span className="inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {news.views ?? 0}</span>
         </div>
@@ -77,9 +77,32 @@ export default function Article() {
 
       <SmartImage src={news.imageUrl} alt={news.title} loading="eager" className="my-6 aspect-[16/9] w-full rounded-xl" />
 
-      <div className="space-y-5 text-lg leading-8">
-        {paragraphs(news.content || news.description).map((p, i) => <p key={i}>{p}</p>)}
-      </div>
+      {news.external && !news.content ? (
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Summary from {news.sourceName || 'the original publisher'}</p>
+          <p className="mt-3 text-lg leading-8">{news.description}</p>
+          {news.sourceUrl && (
+            <a
+              href={news.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400"
+            >
+              Read the full story at {news.sourceName || 'the source'} <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-5 text-lg leading-8">
+          {paragraphs(news.content || news.description).map((p, i) => <p key={i}>{p}</p>)}
+          {news.external && news.sourceUrl && (
+            <p className="text-sm text-neutral-500">
+              Originally published by{' '}
+              <a href={news.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-700 underline dark:text-brand-400">{news.sourceName || 'the source'}</a>.
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 border-t border-neutral-200 pt-6 dark:border-neutral-800">
         <p className="mb-3 text-sm font-semibold">Share this story</p>
