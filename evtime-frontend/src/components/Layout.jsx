@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'motion/react'
 import { useQuery } from '@tanstack/react-query'
 import { Bookmark, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Search, Sun, User, X, Zap } from 'lucide-react'
 import { getCategories, getNews } from '../api/news'
@@ -8,6 +9,7 @@ import { useTheme } from '../context/ThemeContext'
 import { categoryPath, formatDate } from '../utils/format'
 import Footer from './Footer'
 import { BackToTop, ScrollManager } from './ScrollManager'
+import ChatWidget from './ChatWidget'
 
 function Ticker() {
   // refreshed every minute (paused while the tab is hidden) so headlines stay current
@@ -30,7 +32,7 @@ function Ticker() {
         </span>
         Live
       </span>
-      <div className="relative flex-1 overflow-hidden">
+      <div className="ticker-mask relative flex-1 overflow-hidden">
         <div className="ticker-track flex w-max gap-10 whitespace-nowrap py-2 pl-6 text-sm">
           {loop.map((n, i) => (
             <Link key={`${n.id}-${i}`} to={`/news/${n.id}`} className="hover:text-brand-400" tabIndex={i >= items.length ? -1 : 0}>
@@ -75,8 +77,16 @@ function AccountMenu() {
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold uppercase text-white">{(user.name || user.email || '?').charAt(0)}</span>
         <ChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
       </button>
+      <AnimatePresence>
       {open && (
-        <div role="menu" className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+        <motion.div
+          role="menu"
+          className="absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900"
+          initial={{ opacity: 0, scale: 0.92, y: -6 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+        >
           <div className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
             <p className="truncate text-sm font-semibold">{user.name}</p>
             <p className="truncate text-xs text-neutral-500">{user.email}</p>
@@ -85,8 +95,9 @@ function AccountMenu() {
           <Link role="menuitem" to="/bookmarks" className={item} onClick={() => setOpen(false)}><Bookmark className="h-4 w-4" /> Bookmarks</Link>
           {isStaff && <Link role="menuitem" to="/admin" className={item} onClick={() => setOpen(false)}><LayoutDashboard className="h-4 w-4" /> Admin dashboard</Link>}
           <button role="menuitem" onClick={() => { setOpen(false); logout() }} className={`${item} border-t border-neutral-200 dark:border-neutral-800`}><LogOut className="h-4 w-4" /> Sign out</button>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -97,6 +108,13 @@ function Header() {
   const { isAuthenticated, isStaff, logout } = useAuth()
   const { dark, toggle } = useTheme()
   const navigate = useNavigate()
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories, staleTime: 300000 })
 
   const submit = (e) => {
@@ -107,20 +125,30 @@ function Header() {
   }
 
   const linkCls = ({ isActive }) =>
-    `whitespace-nowrap border-b-2 px-1 py-3 text-sm font-semibold transition ${
-      isActive ? 'border-brand-500 text-brand-700 dark:text-brand-400' : 'border-transparent hover:border-neutral-400'
+    `relative whitespace-nowrap px-1 py-3 text-sm font-semibold transition-colors ${
+      isActive ? 'text-brand-700 dark:text-brand-400' : 'hover:text-brand-700 dark:hover:text-brand-400'
     }`
+  const navItem = (to, label, props = {}) => (
+    <NavLink key={to} to={to} className={linkCls} {...props}>
+      {({ isActive }) => (
+        <>
+          {label}
+          {isActive && <motion.span layoutId="nav-underline" className="absolute inset-x-0 bottom-0 h-0.5 rounded bg-brand-500" transition={{ type: 'spring', stiffness: 500, damping: 36 }} />}
+        </>
+      )}
+    </NavLink>
+  )
   const iconBtn = 'rounded-full p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800'
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+    <header className={`sticky top-0 z-40 border-b border-neutral-200 bg-white/95 backdrop-blur transition-shadow duration-300 dark:border-neutral-800 dark:bg-neutral-950/95 ${scrolled ? 'shadow-md' : ''}`}>
       <Ticker />
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+      <div className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-[padding] duration-300 ${scrolled ? 'py-1.5' : 'py-3'}`}>
         <button className={`${iconBtn} lg:hidden`} onClick={() => setOpen((o) => !o)} aria-label="Toggle menu" aria-expanded={open}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
         <div className="hidden text-xs text-neutral-500 lg:block">{formatDate(new Date().toISOString(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-        <Link to="/" className="flex items-center gap-2" aria-label="EV Times home">
+        <Link to="/" className={`flex origin-center items-center gap-2 transition-transform duration-300 ${scrolled ? 'scale-90' : 'scale-100'}`} aria-label="EV Times home">
           <Zap className="h-6 w-6 fill-brand-500 text-brand-500" />
           <span className="font-headline text-2xl font-extrabold tracking-tight md:text-3xl">
             EV <span className="text-brand-600 dark:text-brand-400">TIMES</span>
@@ -135,7 +163,18 @@ function Header() {
             </div>
           </form>
           <button className={iconBtn} onClick={toggle} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
-            {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={dark ? 'sun' : 'moon'}
+                className="flex"
+                initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
+                transition={{ duration: 0.2 }}
+              >
+                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </motion.span>
+            </AnimatePresence>
           </button>
           {isAuthenticated ? (
             <AccountMenu />
@@ -150,16 +189,23 @@ function Header() {
 
       <nav className="hidden border-t border-neutral-200 lg:block dark:border-neutral-800" aria-label="Categories">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4">
-          <NavLink to="/" end className={linkCls}>Home</NavLink>
-          {categories.map((c) => (
-            <NavLink key={c} to={categoryPath(c)} className={linkCls}>{c}</NavLink>
-          ))}
-          <NavLink to="/about" className={linkCls}>About</NavLink>
+          {navItem('/', 'Home', { end: true })}
+          {categories.map((c) => navItem(categoryPath(c), c))}
+          {navItem('/about', 'About')}
         </div>
       </nav>
 
+      <AnimatePresence>
       {open && (
-        <nav className="space-y-1 border-t border-neutral-200 px-4 py-4 lg:hidden dark:border-neutral-800" aria-label="Mobile">
+        <motion.nav
+          className="overflow-hidden border-t border-neutral-200 lg:hidden dark:border-neutral-800"
+          aria-label="Mobile"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="space-y-1 px-4 py-4">
           <form onSubmit={submit} className="mb-3" role="search">
             <label htmlFor="m-search" className="sr-only">Search articles</label>
             <input id="m-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search news..." className="w-full rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700" />
@@ -182,9 +228,21 @@ function Header() {
               </>
             )}
           </div>
-        </nav>
+          </div>
+        </motion.nav>
       )}
+      </AnimatePresence>
     </header>
+  )
+}
+
+/** Fades/slides each new page in. Keyed by path so category and article changes animate too. */
+function PageTransition() {
+  const { pathname } = useLocation()
+  return (
+    <motion.div key={pathname} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+      <Outlet />
+    </motion.div>
   )
 }
 
@@ -195,10 +253,11 @@ export default function Layout() {
       <ScrollManager />
       <Header />
       <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
-        <Outlet />
+        <PageTransition />
       </main>
       <Footer />
       <BackToTop />
+      <ChatWidget />
     </div>
   )
 }

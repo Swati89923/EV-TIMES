@@ -2,7 +2,7 @@
 
 React single-page app for the EV Times news platform.
 
-**Stack:** React 18, Vite, React Router 6, Tailwind CSS 4, TanStack Query, Axios, lucide-react.
+**Stack:** React 18, Vite, React Router 6, Tailwind CSS 4, TanStack Query, Axios, motion, lucide-react.
 
 ## Getting started
 
@@ -45,3 +45,19 @@ Home with featured stories, latest news, most-read and per-section blocks; categ
 ## Deployment
 
 `npm run build` outputs a static site. `vercel.json` and `public/_redirects` provide the SPA fallback for Vercel and Netlify. Set `VITE_API_URL` in the host's environment settings before building.
+
+## Animations
+
+Built with `motion` plus a few CSS keyframes: page transitions, scroll-reveal and staggered cards,
+hero Ken Burns, sliding nav indicator, header shrink on scroll, spring dropdowns/modals, animated
+counters and a reading-progress bar. Everything is wrapped in `MotionConfig reducedMotion="user"`
+and a `prefers-reduced-motion` media query, so users who ask for less motion get a static UI.
+Shared helpers live in `src/components/motionKit.jsx`.
+
+## EV Assistant (chat widget)
+
+`src/components/ChatWidget.jsx` is mounted globally. It calls `POST {VITE_API_URL}/chat` with the
+last 10 messages and shows the reply (lightweight markdown, story links as chips). The conversation
+is kept in `sessionStorage` (last 20 messages). Rate limiting (HTTP 429) and network errors show a
+retry button. The widget needs no API key in the browser; the model is configured on the server.
+
