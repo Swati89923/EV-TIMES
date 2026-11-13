@@ -37,6 +37,18 @@ public class News {
     @Column(length = 100)
     private String author;
 
+    /** Name of the publication for imported stories (null for our own articles). */
+    @Column(length = 100)
+    private String sourceName;
+
+    /** Link to the original story for imported articles. */
+    @Column(length = 1000)
+    private String sourceUrl;
+
+    /** SHA-256 of the source link; used to avoid importing a story twice. */
+    @Column(length = 64, unique = true)
+    private String externalId;
+
     private Boolean featured = false;
 
     private Long views = 0L;

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -33,6 +34,14 @@ public class NewsController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String q) {
         return newsService.list(page, size, sortBy, direction, category, q);
+    }
+
+    @Operation(summary = "Stories published after the given instant (for live updates)")
+    @GetMapping("/latest")
+    public List<NewsResponse> latest(
+            @RequestParam(required = false) Instant since,
+            @RequestParam(defaultValue = "20") int limit) {
+        return newsService.latest(since, limit);
     }
 
     @Operation(summary = "Featured stories for the front page")

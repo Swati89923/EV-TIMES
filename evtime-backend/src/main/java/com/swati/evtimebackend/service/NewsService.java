@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -95,9 +96,17 @@ public class NewsService {
         News news = find(id);
         newsRepository.incrementViews(id);
         long views = (news.getViews() == null ? 0L : news.getViews()) + 1;
-        NewsResponse r = NewsResponse.from(news);
-        return new NewsResponse(r.id(), r.title(), r.description(), r.content(), r.imageUrl(),
-                r.category(), r.author(), r.featured(), views, r.createdAt(), r.updatedAt());
+        return NewsResponse.from(news).withViews(views);
+    }
+
+    /** Stories newer than {@code since} (all latest stories when since is null), newest first. */
+    @Transactional(readOnly = true)
+    public List<NewsResponse> latest(Instant since, int limit) {
+        Pageable pageable = PageRequest.of(0, Math.min(Math.max(limit, 1), MAX_PAGE_SIZE));
+        List<News> items = since == null
+                ? newsRepository.findAllByOrderByCreatedAtDesc(pageable)
+                : newsRepository.findByCreatedAtAfterOrderByCreatedAtDesc(since, pageable);
+        return items.stream().map(NewsResponse::from).toList();
     }
 
     @Transactional

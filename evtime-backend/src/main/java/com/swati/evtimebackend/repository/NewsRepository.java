@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 public interface NewsRepository
@@ -29,4 +33,15 @@ public interface NewsRepository
     @Modifying
     @Query("update News n set n.views = coalesce(n.views, 0) + 1 where n.id = :id")
     int incrementViews(@Param("id") Long id);
+
+    List<News> findByCreatedAtAfterOrderByCreatedAtDesc(Instant since, Pageable pageable);
+
+    @Query("select n.externalId from News n where n.externalId in :ids")
+    List<String> findExistingExternalIds(@Param("ids") Collection<String> ids);
+
+    @Transactional
+    @Modifying
+    @Query("delete from News n where n.externalId is not null and n.createdAt < :cutoff "
+            + "and n.id not in (select b.news.id from Bookmark b)")
+    int deleteOldImported(@Param("cutoff") Instant cutoff);
 }
