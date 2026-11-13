@@ -15,7 +15,15 @@ export function ThemeProvider({ children }) {
     }
   }, [dark])
 
-  return <ThemeContext.Provider value={{ dark, toggle: () => setDark((d) => !d) }}>{children}</ThemeContext.Provider>
+  const toggle = () => {
+    // briefly enable colour transitions so the whole page fades between themes
+    const root = document.documentElement
+    root.classList.add('theme-anim')
+    window.setTimeout(() => root.classList.remove('theme-anim'), 450)
+    setDark((d) => !d)
+  }
+
+  return <ThemeContext.Provider value={{ dark, toggle }}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = () => useContext(ThemeContext)

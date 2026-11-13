@@ -1,13 +1,21 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Clock, Eye, ExternalLink, Link2 } from 'lucide-react'
+import { motion, useScroll, useSpring } from 'motion/react'
 import { getNewsById, getRelated } from '../api/news'
 import ArticleCard, { CategoryTag } from '../components/ArticleCard'
 import BookmarkButton from '../components/BookmarkButton'
 import { ErrorState, SectionHeading, SmartImage, Skeleton } from '../components/ui'
 import { useToast } from '../context/ToastContext'
 import useDocumentTitle from '../hooks/useDocumentTitle'
+import { AnimatedNumber, Reveal } from '../components/motionKit'
 import { byline, formatDate, paragraphs, readTime } from '../utils/format'
+
+function ReadingProgress() {
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 })
+  return <motion.div aria-hidden="true" className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-brand-500" style={{ scaleX }} />
+}
 
 function ShareButtons({ title }) {
   const toast = useToast()
@@ -58,6 +66,7 @@ export default function Article() {
 
   return (
     <article className="mx-auto max-w-3xl">
+      <ReadingProgress />
       <CategoryTag category={news.category} />
       <h1 className="mt-2 text-3xl font-extrabold leading-tight md:text-5xl">{news.title}</h1>
       <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-300">{news.description}</p>
@@ -70,7 +79,7 @@ export default function Article() {
           <span className="mx-2">·</span>
           <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {readTime(news.content || news.description)} min read</span>
           <span className="mx-2">·</span>
-          <span className="inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {news.views ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> <AnimatedNumber value={news.views ?? 0} /></span>
         </div>
         <BookmarkButton id={news.id} />
       </div>
@@ -94,7 +103,7 @@ export default function Article() {
         </div>
       ) : (
         <div className="space-y-5 text-lg leading-8">
-          {paragraphs(news.content || news.description).map((p, i) => <p key={i}>{p}</p>)}
+          {paragraphs(news.content || news.description).map((p, i) => <Reveal as="p" index={i} key={i}>{p}</Reveal>)}
           {news.external && news.sourceUrl && (
             <p className="text-sm text-neutral-500">
               Originally published by{' '}
@@ -113,7 +122,7 @@ export default function Article() {
         <section className="mt-14" aria-label="Related stories">
           <SectionHeading>Related Stories</SectionHeading>
           <div className="grid gap-6 sm:grid-cols-2">
-            {related.data.map((n) => <ArticleCard key={n.id} news={n} />)}
+            {related.data.map((n, i) => <ArticleCard key={n.id} news={n} index={i} />)}
           </div>
         </section>
       )}

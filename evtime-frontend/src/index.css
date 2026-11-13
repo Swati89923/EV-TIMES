@@ -22,3 +22,52 @@ h1, h2, h3, .font-headline { font-family: var(--font-serif); }
 .ticker-track { animation: ticker 40s linear infinite; }
 .ticker-track:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+
+/* ---------- motion ---------- */
+button:not(:disabled):active { transform: scale(0.97); }
+button { transition-property: color, background-color, border-color, box-shadow, transform, opacity; transition-duration: .15s; }
+
+/* animated headline underline (use on a link inside a .group) */
+.hl-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 2px;
+  transition: background-size .35s ease;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.group:hover .hl-underline, .hl-underline:hover, .hl-underline:focus-visible { background-size: 100% 2px; }
+
+/* hero Ken Burns */
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.1) translate3d(-1.5%, -1%, 0); } }
+.kenburns { animation: kenburns 24s ease-in-out infinite alternate; will-change: transform; }
+
+/* shimmer skeleton */
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.shimmer {
+  background-color: rgb(229 229 229);
+  background-image: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .55) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+.dark .shimmer { background-color: rgb(38 38 38); background-image: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .07) 50%, transparent 70%); }
+
+/* ticker edges fade out */
+.ticker-mask { -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+
+/* smooth colour change when the theme is toggled */
+.theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease, fill .35s ease !important;
+}
+
+/* chat typing dots */
+@keyframes typing-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-4px); opacity: 1; } }
+.typing-dot { animation: typing-dot 1.1s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .kenburns, .shimmer, .typing-dot, .animate-ping, .animate-pulse { animation: none !important; }
+  .theme-anim, .theme-anim * { transition: none !important; }
+  button:not(:disabled):active { transform: none; }
+}
