@@ -1,0 +1,17 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# dependencies / build output
+node_modules/
+dist/
+build/
+.gradle/
+
+# local tooling
+.claude/
+.vscode/
+.idea/
+*.log
+.DS_Store
