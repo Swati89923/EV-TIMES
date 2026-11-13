@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { ArrowUp, CheckCircle2, Loader2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import ArticleCard from './ArticleCard'
 import { EmptyState, ErrorState, Skeleton } from './ui'
 import useInfiniteFeed from '../hooks/useInfiniteFeed'
@@ -47,24 +48,35 @@ export default function Feed({ params, live = true, category, lead = true, showC
 
   return (
     <div>
-      {pending.length > 0 && (
-        <div className="sticky top-36 z-30 -mt-1 mb-3 flex justify-center">
-          <button
-            onClick={showPending}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-lg ring-1 ring-black/10 transition hover:bg-brand-700"
-            aria-live="polite"
+      <AnimatePresence>
+        {pending.length > 0 && (
+          <motion.div
+            key="pill"
+            className="sticky top-36 z-30 -mt-1 mb-3 flex justify-center"
+            initial={{ opacity: 0, y: -24, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -16, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 22 }}
           >
-            <ArrowUp className="h-4 w-4" />
-            {pending.length} new {pending.length === 1 ? 'story' : 'stories'}
-          </button>
-        </div>
-      )}
+            <button
+              onClick={showPending}
+              className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-lg ring-1 ring-black/10 hover:bg-brand-700"
+              aria-live="polite"
+            >
+              <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1.2, repeat: Infinity }} className="inline-flex">
+                <ArrowUp className="h-4 w-4" />
+              </motion.span>
+              {pending.length} new {pending.length === 1 ? 'story' : 'stories'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {showCount && <p className="mb-2 text-sm text-neutral-500">{feed.total} article{feed.total === 1 ? '' : 's'}</p>}
 
       {first && <ArticleCard news={first} variant="lead" />}
       <div>
-        {rest.map((n) => <ArticleCard key={n.id} news={n} variant="feed" />)}
+        {rest.map((n, i) => <ArticleCard key={n.id} news={n} variant="feed" index={i} />)}
       </div>
 
       {hasNextPage && <div ref={sentinel} aria-hidden="true" className="h-px" />}

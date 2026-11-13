@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Flame, Rss } from 'lucide-react'
 import { getCategories, getFeatured, getNews, getTrending } from '../api/news'
@@ -10,6 +11,7 @@ import { SOURCES } from '../utils/sources'
 import { categoryPath } from '../utils/format'
 import useDocumentTitle from '../hooks/useDocumentTitle'
 import useInView from '../hooks/useInView'
+import { Reveal } from '../components/motionKit'
 
 /** A short list of stories for one topic. Only fetched once it nears the viewport. */
 function CategoryStrip({ category }) {
@@ -36,8 +38,8 @@ function CategoryStrip({ category }) {
         <div className="space-y-3"><Skeleton className="aspect-[16/10] w-full" />{[0, 1, 2].map((i) => <Skeleton key={i} className="h-10" />)}</div>
       ) : (
         <div className="space-y-3">
-          {lead && <ArticleCard news={lead} />}
-          {rest.map((n) => <ArticleCard key={n.id} news={n} variant="text" />)}
+          {lead && <ArticleCard news={lead} index={0} />}
+          {rest.map((n, i) => <ArticleCard key={n.id} news={n} variant="text" index={i + 1} />)}
         </div>
       )}
     </section>
@@ -56,10 +58,10 @@ function Sidebar({ trending, categories }) {
         ) : (
           <ol className="space-y-4">
             {(trending.data ?? []).map((n, i) => (
-              <li key={n.id} className="flex gap-3">
+              <Reveal as="li" index={i} key={n.id} className="flex gap-3">
                 <span className="font-headline text-3xl font-extrabold leading-none text-brand-500/70">{i + 1}</span>
                 <Link to={`/news/${n.id}`} className="text-sm font-semibold leading-snug hover:text-brand-700 dark:hover:text-brand-400">{n.title}</Link>
-              </li>
+              </Reveal>
             ))}
           </ol>
         )}
@@ -69,7 +71,9 @@ function Sidebar({ trending, categories }) {
         <h2 className="mb-3 text-xl font-bold">Browse topics</h2>
         <div className="flex flex-wrap gap-2">
           {(categories.data ?? []).map((c) => (
-            <Link key={c} to={categoryPath(c)} className="rounded-full border border-brand-600/30 bg-white px-3 py-1 text-sm font-medium hover:bg-brand-600 hover:text-white dark:bg-neutral-800">{c}</Link>
+            <motion.span key={c} whileHover={{ y: -2, scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
+              <Link to={categoryPath(c)} className="inline-block rounded-full border border-brand-600/30 bg-white px-3 py-1 text-sm font-medium hover:bg-brand-600 hover:text-white dark:bg-neutral-800">{c}</Link>
+            </motion.span>
           ))}
         </div>
       </div>

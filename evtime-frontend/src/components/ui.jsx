@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { AlertTriangle, ChevronLeft, ChevronRight, Inbox, X } from 'lucide-react'
 import { PLACEHOLDER_IMAGE, timeAgo } from '../utils/format'
 import useNow from '../hooks/useNow'
@@ -40,7 +41,7 @@ export function LiveBadge() {
 }
 
 export function Skeleton({ className = '' }) {
-  return <div className={`animate-pulse rounded bg-neutral-200 dark:bg-neutral-800 ${className}`} aria-hidden="true" />
+  return <div className={`shimmer rounded ${className}`} aria-hidden="true" />
 }
 
 export function CardSkeleton() {
@@ -107,19 +108,39 @@ export function Pagination({ page, totalPages, onChange }) {
 }
 
 export function Modal({ open, title, children, onClose }) {
-  if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-3 flex items-start justify-between">
-          <h2 className="text-xl font-bold">{title}</h2>
-          <button onClick={onClose} aria-label="Close" className="rounded p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <motion.div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-neutral-900"
+            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+          >
+            <div className="mb-3 flex items-start justify-between">
+              <h2 className="text-xl font-bold">{title}</h2>
+              <button onClick={onClose} aria-label="Close" className="rounded p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
