@@ -2,6 +2,10 @@
 
 A news website for electric-vehicle coverage: batteries, charging infrastructure, policy, markets and reviews.
 
+### 🌐 Live site: **https://evtimes.vercel.app**
+
+API: https://api-production-3f76d453.up.railway.app (health: `/actuator/health`)
+
 | Layer    | Stack |
 |----------|-------|
 | Frontend | React 18, Vite, React Router, Tailwind CSS, TanStack Query, Axios |
@@ -96,6 +100,8 @@ Frontend: `VITE_API_URL` – base URL of the API including `/api`.
 | GET | `/api/news/latest?since=` | public |
 | POST | `/api/auth/google` (Google ID token) | public |
 | GET | `/sitemap.xml`, `/rss.xml`, `/share/news/{id}` | public |
+| POST | `/api/newsletter/subscribe`, `/api/contact` | public, rate limited |
+| GET | `/api/admin/subscribers`, `/api/admin/messages` | `ADMIN` |
 | GET | `/actuator/health` | public |
 
 Errors are JSON: `{ "status": 400, "message": "...", "errors": { "field": "..." } }`.
