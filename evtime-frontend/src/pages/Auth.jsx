@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { errorMessage } from '../api/client'
 import { inputCls } from '../components/ui'
 import useDocumentTitle from '../hooks/useDocumentTitle'
+import GoogleButton from '../components/GoogleButton'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -107,7 +108,7 @@ function AuthShell({ title, subtitle, children, footer }) {
             ))}
           </ul>
         </div>
-        <p className="relative text-xs text-neutral-400">Free to join. Your account is just a name, an email and a password.</p>
+        <p className="relative text-xs text-neutral-400">Free to join. Continue with Google, or use just a name, an email and a password.</p>
       </aside>
 
       <div className="p-6 sm:p-10">
@@ -152,7 +153,8 @@ function useAuthForm(action) {
       setLoading(false)
     }
   }
-  return { errors, serverError, loading, submit }
+  const redirect = () => navigate(location.state?.from || '/', { replace: true })
+  return { errors, serverError, setServerError, loading, setLoading, submit, redirect }
 }
 
 const submitBtn = 'w-full rounded-md bg-ink py-3 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400'
@@ -166,7 +168,7 @@ export function Login() {
   useDocumentTitle('Sign in')
   const { login, isAuthenticated } = useAuth()
   const location = useLocation()
-  const { errors, serverError, loading, submit } = useAuthForm(login)
+  const { errors, serverError, setServerError, loading, setLoading, submit, redirect } = useAuthForm(login)
   const [password, setPassword] = useState('')
   if (isAuthenticated) return <Navigate to={location.state?.from || '/'} replace />
 
@@ -187,6 +189,7 @@ export function Login() {
       subtitle={location.state?.from ? 'Please sign in to continue.' : 'Sign in to save stories and manage your account.'}
       footer={<>New to EV Times? <Link to="/signup" state={location.state} className="font-semibold text-brand-700 hover:underline dark:text-brand-400">Create an account</Link></>}
     >
+      <GoogleButton onSuccess={redirect} onError={setServerError} onBusy={setLoading} />
       <form onSubmit={onSubmit} noValidate className="space-y-4" aria-busy={loading}>
         <ServerError message={serverError} />
         <Field id="email" type="email" label="Email" autoComplete="email" error={errors.email} />
@@ -201,7 +204,7 @@ export function Signup() {
   useDocumentTitle('Create account')
   const { signup, isAuthenticated } = useAuth()
   const location = useLocation()
-  const { errors, serverError, loading, submit } = useAuthForm(signup)
+  const { errors, serverError, setServerError, loading, setLoading, submit, redirect } = useAuthForm(signup)
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   if (isAuthenticated) return <Navigate to={location.state?.from || '/'} replace />
@@ -226,6 +229,7 @@ export function Signup() {
       subtitle="Create a free account to bookmark stories."
       footer={<>Already registered? <Link to="/login" state={location.state} className="font-semibold text-brand-700 hover:underline dark:text-brand-400">Sign in</Link></>}
     >
+      <GoogleButton onSuccess={redirect} onError={setServerError} onBusy={setLoading} />
       <form onSubmit={onSubmit} noValidate className="space-y-4" aria-busy={loading}>
         <ServerError message={serverError} />
         <Field id="name" label="Full name" autoComplete="name" error={errors.name} />

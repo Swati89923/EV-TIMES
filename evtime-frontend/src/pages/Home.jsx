@@ -5,7 +5,6 @@ import { ArrowRight, Flame, Rss } from 'lucide-react'
 import { getCategories, getFeatured, getNews, getTrending } from '../api/news'
 import ArticleCard from '../components/ArticleCard'
 import Feed from '../components/Feed'
-import Newsletter from '../components/Newsletter'
 import { ErrorState, LiveBadge, SectionHeading, Skeleton } from '../components/ui'
 import { SOURCES } from '../utils/sources'
 import { categoryPath } from '../utils/format'
@@ -90,7 +89,15 @@ function Sidebar({ trending, categories }) {
 }
 
 export default function Home() {
-  useDocumentTitle(null, 'Breaking electric vehicle news, analysis and reviews from EV Times.')
+  useDocumentTitle(null, 'Breaking electric vehicle news, analysis and reviews from EV Times.', {
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'EV Times',
+      url: window.location.origin,
+      potentialAction: { '@type': 'SearchAction', target: `${window.location.origin}/search?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+    },
+  })
 
   const featured = useQuery({ queryKey: ['featured'], queryFn: getFeatured, refetchInterval: 120000 })
   const trending = useQuery({ queryKey: ['trending'], queryFn: getTrending })
@@ -138,7 +145,6 @@ export default function Home() {
         <Sidebar trending={trending} categories={categories} />
       </div>
 
-      <Newsletter />
     </div>
   )
 }

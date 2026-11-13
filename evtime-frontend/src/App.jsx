@@ -2,19 +2,34 @@ import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
+import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
-import { CategoryPage, SearchPage } from './pages/NewsList'
-import Article from './pages/Article'
-import { Login, Signup } from './pages/Auth'
-import { Bookmarks, Profile } from './pages/Account'
-import { About, Advertise, Careers, Contact, Cookies, NotFound, Privacy, Terms } from './pages/Static'
 import { Skeleton } from './components/ui'
+
+// Everything except the front page is loaded on demand to keep the first download small.
+const named = (loader, name) => lazy(() => loader().then((m) => ({ default: m[name] })))
+const CategoryPage = named(() => import('./pages/NewsList'), 'CategoryPage')
+const SearchPage = named(() => import('./pages/NewsList'), 'SearchPage')
+const Article = lazy(() => import('./pages/Article'))
+const Login = named(() => import('./pages/Auth'), 'Login')
+const Signup = named(() => import('./pages/Auth'), 'Signup')
+const Bookmarks = named(() => import('./pages/Account'), 'Bookmarks')
+const Profile = named(() => import('./pages/Account'), 'Profile')
+const About = named(() => import('./pages/Static'), 'About')
+const Advertise = named(() => import('./pages/Static'), 'Advertise')
+const Careers = named(() => import('./pages/Static'), 'Careers')
+const Contact = named(() => import('./pages/Static'), 'Contact')
+const Cookies = named(() => import('./pages/Static'), 'Cookies')
+const NotFound = named(() => import('./pages/Static'), 'NotFound')
+const Privacy = named(() => import('./pages/Static'), 'Privacy')
+const Terms = named(() => import('./pages/Static'), 'Terms')
 
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const ArticleForm = lazy(() => import('./pages/admin/ArticleForm'))
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <Suspense fallback={<Skeleton className="m-8 h-64" />}>
       <Routes>
         <Route element={<Layout />}>
@@ -44,5 +59,6 @@ export default function App() {
         </Route>
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   )
 }

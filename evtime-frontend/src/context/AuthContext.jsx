@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
       isStaff: user?.role === 'ADMIN' || user?.role === 'EDITOR',
       login: async (body) => persist(await authApi.login(body)),
       signup: async (body) => persist(await authApi.signup(body)),
+      googleLogin: async (credential) => persist(await authApi.googleLogin(credential)),
       logout,
     }),
     [user, persist, logout],

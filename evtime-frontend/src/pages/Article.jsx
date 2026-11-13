@@ -1,8 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Clock, Eye, ExternalLink, Link2 } from 'lucide-react'
+import { Clock, Eye, ExternalLink, Link2, Share2 } from 'lucide-react'
 import { motion, useScroll, useSpring } from 'motion/react'
 import { getNewsById, getRelated } from '../api/news'
+import { API_ORIGIN } from '../api/client'
 import ArticleCard, { CategoryTag } from '../components/ArticleCard'
 import BookmarkButton from '../components/BookmarkButton'
 import { ErrorState, SectionHeading, SmartImage, Skeleton } from '../components/ui'
@@ -17,10 +18,12 @@ function ReadingProgress() {
   return <motion.div aria-hidden="true" className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-brand-500" style={{ scaleX }} />
 }
 
-function ShareButtons({ title }) {
+function ShareButtons({ id, title }) {
   const toast = useToast()
-  const url = window.location.href
-  const cls = 'inline-flex items-center gap-2 rounded-full border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800'
+  // The backend page carries Open Graph tags (title, image) and sends people on to the article.
+  const url = `${API_ORIGIN}/share/news/${id}`
+  const cls = 'inline-flex items-center gap-2 rounded-full border border-neutral-300 px-3 py-1.5 text-sm transition hover:bg-neutral-100 active:scale-95 dark:border-neutral-700 dark:hover:bg-neutral-800'
+  const enc = encodeURIComponent
 
   const copy = async () => {
     try {
@@ -31,11 +34,30 @@ function ShareButtons({ title }) {
     }
   }
 
+  const nativeShare = async () => {
+    try {
+      await navigator.share({ title, url })
+    } catch {
+      /* dismissed by the user */
+    }
+  }
+
+  const links = [
+    ['WhatsApp', `https://wa.me/?text=${enc(`${title} ${url}`)}`],
+    ['X', `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}`],
+    ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`],
+    ['LinkedIn', `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`],
+  ]
+
   return (
     <div className="flex flex-wrap items-center gap-2" aria-label="Share this article">
+      {typeof navigator !== 'undefined' && navigator.share && (
+        <button onClick={nativeShare} className={`${cls} border-brand-500 text-brand-700 dark:text-brand-400`}><Share2 className="h-4 w-4" /> Share</button>
+      )}
       <button onClick={copy} className={cls}><Link2 className="h-4 w-4" /> Copy link</button>
-      <a className={cls} target="_blank" rel="noopener noreferrer" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`}>Share on X</a>
-      <a className={cls} target="_blank" rel="noopener noreferrer" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}>LinkedIn</a>
+      {links.map(([label, href]) => (
+        <a key={label} className={cls} target="_blank" rel="noopener noreferrer" href={href} aria-label={`Share on ${label}`}>{label}</a>
+      ))}
     </div>
   )
 }
@@ -44,7 +66,23 @@ export default function Article() {
   const { id } = useParams()
   const { data: news, isLoading, isError, error, refetch } = useQuery({ queryKey: ['news', id], queryFn: () => getNewsById(id), retry: false })
   const related = useQuery({ queryKey: ['related', id], queryFn: () => getRelated(id), enabled: !!news })
-  useDocumentTitle(news?.title, news?.description)
+  useDocumentTitle(news?.title, news?.description, news && {
+    image: news.imageUrl || undefined,
+    type: 'article',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: news.title,
+      description: news.description,
+      image: news.imageUrl ? [news.imageUrl] : undefined,
+      datePublished: news.createdAt,
+      dateModified: news.updatedAt || news.createdAt,
+      articleSection: news.category,
+      author: { '@type': news.external ? 'Organization' : 'Person', name: news.external ? news.sourceName || 'EV Times' : news.author || 'EV Times Desk' },
+      publisher: { '@type': 'Organization', name: 'EV Times', logo: { '@type': 'ImageObject', url: `${window.location.origin}/icon-512.png` } },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+    },
+  })
 
   if (isLoading) {
     return (
@@ -84,7 +122,7 @@ export default function Article() {
         <BookmarkButton id={news.id} />
       </div>
 
-      <SmartImage src={news.imageUrl} alt={news.title} loading="eager" className="my-6 aspect-[16/9] w-full rounded-xl" />
+      <SmartImage src={news.imageUrl} alt={news.title} loading="eager" fetchpriority="high" className="my-6 aspect-[16/9] w-full rounded-xl" />
 
       {news.external && !news.content ? (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900">
@@ -115,7 +153,7 @@ export default function Article() {
 
       <div className="mt-8 border-t border-neutral-200 pt-6 dark:border-neutral-800">
         <p className="mb-3 text-sm font-semibold">Share this story</p>
-        <ShareButtons title={news.title} />
+        <ShareButtons id={news.id} title={news.title} />
       </div>
 
       {(related.data ?? []).length > 0 && (

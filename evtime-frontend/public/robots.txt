@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+
+# Replace example.com with your real domain (see evtime-frontend/README.md, "Going live").
+# The sitemap is served by the backend: https://<your-api-domain>/sitemap.xml
+Sitemap: https://example.com/sitemap.xml
