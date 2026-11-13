@@ -21,6 +21,5 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 EXPOSE 8080
-VOLUME /app/uploads
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
