@@ -35,3 +35,14 @@ export function paragraphs(text = '') {
 }
 
 export const categoryPath = (c) => `/category/${encodeURIComponent(c)}`
+
+/** Source label for an imported story, or the author for our own. */
+export const byline = (news) => (news.external ? news.sourceName : news.author)
+
+export function hostOf(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return ''
+  }
+}
