@@ -7,7 +7,7 @@ import { CategoryPage, SearchPage } from './pages/NewsList'
 import Article from './pages/Article'
 import { Login, Signup } from './pages/Auth'
 import { Bookmarks, Profile } from './pages/Account'
-import { About, NotFound } from './pages/Static'
+import { About, Advertise, Careers, Contact, Cookies, NotFound, Privacy, Terms } from './pages/Static'
 import { Skeleton } from './components/ui'
 
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
@@ -25,6 +25,12 @@ export default function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="careers" element={<Careers />} />
+          <Route path="advertise" element={<Advertise />} />
+          <Route path="privacy" element={<Privacy />} />
+          <Route path="terms" element={<Terms />} />
+          <Route path="cookies" element={<Cookies />} />
           <Route element={<ProtectedRoute />}>
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="profile" element={<Profile />} />

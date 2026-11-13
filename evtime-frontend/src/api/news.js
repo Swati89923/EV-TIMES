@@ -21,3 +21,6 @@ export const getBookmarks = () => client.get('/bookmarks').then((r) => r.data)
 export const getBookmarkIds = () => client.get('/bookmarks/ids').then((r) => r.data)
 export const addBookmark = (id) => client.post(`/bookmarks/${id}`)
 export const removeBookmark = (id) => client.delete(`/bookmarks/${id}`)
+
+export const getLatest = (since, limit = 20) =>
+  client.get('/news/latest', { params: clean({ since, limit }) }).then((r) => r.data)

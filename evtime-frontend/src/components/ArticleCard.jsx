@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Clock } from 'lucide-react'
-import { SmartImage } from './ui'
-import { categoryPath, readTime, timeAgo } from '../utils/format'
+import { Clock, ExternalLink } from 'lucide-react'
+import { SmartImage, TimeAgo } from './ui'
+import { byline, categoryPath, readTime } from '../utils/format'
 
 export function CategoryTag({ category }) {
   if (!category) return null
@@ -12,20 +12,42 @@ export function CategoryTag({ category }) {
   )
 }
 
-function Meta({ news }) {
+/** Source name for imported stories (small badge), author for our own. */
+export function SourceBadge({ news, light = false }) {
+  const name = byline(news)
+  if (!name) return null
+  if (!news.external) return <span>{name}</span>
   return (
-    <p className="flex flex-wrap items-center gap-x-3 text-xs text-neutral-500 dark:text-neutral-400">
-      {news.author && <span>{news.author}</span>}
-      <span>{timeAgo(news.createdAt)}</span>
-      <span className="inline-flex items-center gap-1">
-        <Clock className="h-3 w-3" />
-        {readTime(news.content || news.description)} min
-      </span>
+    <span
+      className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold ${
+        light ? 'bg-white/15 text-white' : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200'
+      }`}
+      title={`Source: ${name}`}
+    >
+      <ExternalLink className="h-3 w-3" aria-hidden="true" />
+      {name}
+    </span>
+  )
+}
+
+function Meta({ news, showRead = true }) {
+  return (
+    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+      <SourceBadge news={news} />
+      <TimeAgo iso={news.createdAt} />
+      {showRead && (
+        <span className="inline-flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {readTime(news.content || news.description)} min
+        </span>
+      )}
     </p>
   )
 }
 
-/** variant: card (default) | hero | compact | row */
+const titleLink = 'hover:text-brand-700 dark:hover:text-brand-400'
+
+/** variant: card (default) | hero | lead | compact | feed | row | text */
 export default function ArticleCard({ news, variant = 'card' }) {
   const link = `/news/${news.id}`
 
@@ -42,7 +64,25 @@ export default function ArticleCard({ news, variant = 'card' }) {
             <Link to={link} className="hover:underline">{news.title}</Link>
           </h2>
           <p className="hidden max-w-2xl text-sm text-neutral-200 md:block md:text-base">{news.description}</p>
-          <p className="text-xs text-neutral-300">{news.author} · {timeAgo(news.createdAt)}</p>
+          <p className="flex flex-wrap items-center gap-2 text-xs text-neutral-300">
+            <SourceBadge news={news} light /> <TimeAgo iso={news.createdAt} />
+          </p>
+        </div>
+      </article>
+    )
+  }
+
+  if (variant === 'lead') {
+    return (
+      <article className="group grid gap-5 border-b border-neutral-200 pb-7 md:grid-cols-5 dark:border-neutral-800">
+        <Link to={link} className="block overflow-hidden rounded-xl md:col-span-3" tabIndex={-1} aria-hidden="true">
+          <SmartImage src={news.imageUrl} alt="" className="aspect-[16/10] w-full transition duration-500 group-hover:scale-105" />
+        </Link>
+        <div className="space-y-3 md:col-span-2">
+          <CategoryTag category={news.category} />
+          <h3 className="text-2xl font-extrabold leading-tight md:text-3xl"><Link to={link} className={titleLink}>{news.title}</Link></h3>
+          <p className="line-clamp-4 text-sm text-neutral-600 dark:text-neutral-400">{news.description}</p>
+          <Meta news={news} />
         </div>
       </article>
     )
@@ -56,25 +96,35 @@ export default function ArticleCard({ news, variant = 'card' }) {
         </Link>
         <div className="space-y-1">
           <CategoryTag category={news.category} />
-          <h3 className="text-sm font-bold leading-snug"><Link to={link} className="hover:text-brand-700 dark:hover:text-brand-400">{news.title}</Link></h3>
-          <p className="text-xs text-neutral-500">{timeAgo(news.createdAt)}</p>
+          <h3 className="text-sm font-bold leading-snug"><Link to={link} className={titleLink}>{news.title}</Link></h3>
+          <p className="text-xs text-neutral-500"><TimeAgo iso={news.createdAt} /></p>
         </div>
       </article>
     )
   }
 
-  if (variant === 'row') {
+  if (variant === 'text') {
     return (
-      <article className="flex flex-col gap-4 border-b border-neutral-200 py-5 sm:flex-row dark:border-neutral-800">
-        <Link to={link} className="shrink-0" tabIndex={-1} aria-hidden="true">
-          <SmartImage src={news.imageUrl} alt="" className="aspect-[16/10] w-full rounded-lg sm:w-60" />
-        </Link>
-        <div className="space-y-2">
+      <article className="space-y-1 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+        <h3 className="text-sm font-bold leading-snug"><Link to={link} className={titleLink}>{news.title}</Link></h3>
+        <p className="text-xs text-neutral-500"><TimeAgo iso={news.createdAt} /></p>
+      </article>
+    )
+  }
+
+  // dense news-feed row: text on the left, thumbnail on the right
+  if (variant === 'feed' || variant === 'row') {
+    return (
+      <article className="group flex items-start gap-4 border-b border-neutral-200 py-5 dark:border-neutral-800">
+        <div className="min-w-0 flex-1 space-y-1.5">
           <CategoryTag category={news.category} />
-          <h3 className="text-xl font-bold leading-snug"><Link to={link} className="hover:text-brand-700 dark:hover:text-brand-400">{news.title}</Link></h3>
-          <p className="line-clamp-2 text-sm text-neutral-600 dark:text-neutral-400">{news.description}</p>
+          <h3 className="text-lg font-bold leading-snug md:text-xl"><Link to={link} className={titleLink}>{news.title}</Link></h3>
+          <p className="hidden line-clamp-2 text-sm text-neutral-600 sm:block dark:text-neutral-400">{news.description}</p>
           <Meta news={news} />
         </div>
+        <Link to={link} className="shrink-0 overflow-hidden rounded-lg" tabIndex={-1} aria-hidden="true">
+          <SmartImage src={news.imageUrl} alt="" className="aspect-[4/3] w-28 transition duration-500 group-hover:scale-105 sm:w-44" />
+        </Link>
       </article>
     )
   }
@@ -85,7 +135,7 @@ export default function ArticleCard({ news, variant = 'card' }) {
         <SmartImage src={news.imageUrl} alt="" className="aspect-[16/10] w-full transition duration-500 group-hover:scale-105" />
       </Link>
       <CategoryTag category={news.category} />
-      <h3 className="text-lg font-bold leading-snug"><Link to={link} className="hover:text-brand-700 dark:hover:text-brand-400">{news.title}</Link></h3>
+      <h3 className="text-lg font-bold leading-snug"><Link to={link} className={titleLink}>{news.title}</Link></h3>
       <p className="line-clamp-2 text-sm text-neutral-600 dark:text-neutral-400">{news.description}</p>
       <Meta news={news} />
     </article>
