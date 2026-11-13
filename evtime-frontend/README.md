@@ -61,3 +61,19 @@ last 10 messages and shows the reply (lightweight markdown, story links as chips
 is kept in `sessionStorage` (last 20 messages). Rate limiting (HTTP 429) and network errors show a
 retry button. The widget needs no API key in the browser; the model is configured on the server.
 
+
+## Sign in with Google
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an **OAuth client ID** of type *Web application*.
+2. Under **Authorized JavaScript origins** add every address the site is served from, e.g. `http://localhost:5173` and `https://your-domain.com`.
+3. Set `GOOGLE_CLIENT_ID` on the **backend** (the frontend reads it from `GET /api/auth/config`, so nothing else to configure).
+4. Fill in the OAuth consent screen (app name, support email, privacy policy link `/privacy`) and publish it so any Google account can sign in.
+
+When the backend has no client id the Google button is simply not shown.
+
+## Going live
+
+- **Domain placeholders:** replace `https://example.com` in `index.html` (canonical link, RSS link, default share image) and in `public/robots.txt` (Sitemap line, served by the backend at `/sitemap.xml`) with your real addresses.
+- **Share links:** article share buttons point to `<API origin>/share/news/<id>`, a small page served by the backend with Open Graph tags that redirects people to the article. Set `FRONTEND_URL` on the backend to your site address.
+- **Vercel / Netlify:** build command `npm run build`, output directory `dist`, environment variable `VITE_API_URL=https://<your-api-domain>/api`. `vercel.json` and `public/_redirects` already provide the single-page-app fallback.
+- Add the site address to the backend `CORS_ALLOWED_ORIGINS`.
