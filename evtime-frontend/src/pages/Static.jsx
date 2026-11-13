@@ -1,3 +1,5 @@
+import { sendContact } from '../api/forms'
+import { errorMessage } from '../api/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BatteryCharging, Briefcase, CheckCircle2, Globe2, Mail, Megaphone, ShieldCheck } from 'lucide-react'
@@ -50,16 +52,29 @@ export function Contact() {
   useDocumentTitle('Contact us', 'Get in touch with the EV Times team.')
   const [errors, setErrors] = useState({})
   const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [serverError, setServerError] = useState('')
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    const f = new FormData(e.currentTarget)
+    const form = e.currentTarget
+    const f = new FormData(form)
     const found = {}
     if (!f.get('name').trim()) found.name = 'Please tell us your name'
     if (!EMAIL_RE.test(f.get('email').trim())) found.email = 'Enter a valid email address'
     if (f.get('message').trim().length < 10) found.message = 'Please write at least a sentence or two'
     setErrors(found)
-    if (!Object.keys(found).length) setSent(true)
+    if (Object.keys(found).length) return
+    setServerError('')
+    setBusy(true)
+    try {
+      await sendContact({ name: f.get('name').trim(), email: f.get('email').trim(), message: f.get('message').trim() })
+      setSent(true)
+    } catch (err) {
+      setServerError(errorMessage(err, 'Could not send your message. Please try again.'))
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -82,10 +97,11 @@ export function Contact() {
             <textarea id="c-message" name="message" rows={5} className={inputCls} aria-invalid={!!errors.message} />
             {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
           </div>
-          <button className="rounded-md bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-neutral-800 dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400">Send message</button>
+          {serverError && <p role="alert" className="text-sm text-red-600">{serverError}</p>}
+          <button disabled={busy} className="rounded-md bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-60 dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400">{busy ? 'Sending...' : 'Send message'}</button>
         </form>
       )}
-      <p className="flex items-center gap-2 text-sm"><Mail className="h-4 w-4 text-brand-600" /> This form is a demo and does not send mail yet.</p>
+      <p className="flex items-center gap-2 text-sm"><Mail className="h-4 w-4 text-brand-600" /> We read every message and reply as soon as we can.</p>
     </Page>
   )
 }

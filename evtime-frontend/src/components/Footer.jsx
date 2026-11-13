@@ -1,3 +1,5 @@
+import { subscribeNewsletter } from '../api/forms'
+import { errorMessage } from '../api/client'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -36,16 +38,25 @@ function FooterNewsletter() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [busy, setBusy] = useState(false)
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     if (!EMAIL_RE.test(email.trim())) {
       setError('Please enter a valid email address.')
       return
     }
     setError('')
-    setDone(true)
-    setEmail('')
+    setBusy(true)
+    try {
+      await subscribeNewsletter(email.trim())
+      setDone(true)
+      setEmail('')
+    } catch (err) {
+      setError(errorMessage(err, 'Could not subscribe right now. Please try again.'))
+    } finally {
+      setBusy(false)
+    }
   }
 
   if (done) {
@@ -71,7 +82,7 @@ function FooterNewsletter() {
           aria-describedby={error ? 'footer-email-err' : undefined}
           className="min-w-0 flex-1 rounded-md bg-white/10 px-3 py-2.5 text-sm text-white outline-none ring-1 ring-white/20 placeholder:text-neutral-400 focus:ring-brand-400"
         />
-        <button className="rounded-md bg-brand-500 px-4 text-sm font-semibold text-ink hover:bg-brand-400">Subscribe</button>
+        <button disabled={busy} className="rounded-md bg-brand-500 px-4 text-sm font-semibold text-ink hover:bg-brand-400 disabled:opacity-60">{busy ? 'Subscribing...' : 'Subscribe'}</button>
       </div>
       {error && <p id="footer-email-err" className="mt-2 text-xs text-red-300">{error}</p>}
     </form>

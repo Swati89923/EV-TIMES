@@ -92,12 +92,26 @@ public class ChatService {
 
     private List<News> relatedStories(String question) {
         List<String> keywords = keywords(question);
-        var byDate = PageRequest.of(0, CONTEXT_STORIES, Sort.by("createdAt").descending());
         if (!keywords.isEmpty()) {
-            List<News> found = newsRepository.findAll(matchAny(keywords), byDate).getContent();
-            if (!found.isEmpty()) return found;
+            List<News> found = new ArrayList<>(newsRepository.findAll(matchAny(keywords),
+                    PageRequest.of(0, 25, Sort.by("createdAt").descending())).getContent());
+            // best matches first: stories mentioning more of the question's keywords
+            found.sort(Comparator.comparingInt((News n) -> -score(n, keywords)));
+            int best = found.isEmpty() ? 0 : score(found.get(0), keywords);
+            int min = Math.max(1, (best + 1) / 2);
+            return found.stream().filter(n -> score(n, keywords) >= min).limit(CONTEXT_STORIES).toList();
         }
         return List.of();
+    }
+
+    private static int score(News n, List<String> keywords) {
+        String title = n.getTitle().toLowerCase(Locale.ROOT);
+        String text = title + " " + n.getDescription().toLowerCase(Locale.ROOT);
+        int score = 0;
+        for (String k : keywords) {
+            if (text.contains(k)) score += title.contains(k) ? 2 : 1;
+        }
+        return score;
     }
 
     private static Specification<News> matchAny(List<String> keywords) {

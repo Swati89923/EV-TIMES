@@ -20,7 +20,8 @@ import java.util.Set;
 @Component
 public class AuthRateLimitFilter extends OncePerRequestFilter {
 
-    private static final Set<String> LIMITED = Set.of("/api/auth/login", "/api/auth/signup", "/api/auth/google");
+    private static final Set<String> LIMITED = Set.of("/api/auth/login", "/api/auth/signup", "/api/auth/google",
+            "/api/newsletter/subscribe", "/api/contact");
 
     private final RateLimiter limiter;
     private final ObjectMapper mapper;
