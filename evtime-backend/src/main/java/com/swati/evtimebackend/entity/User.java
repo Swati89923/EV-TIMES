@@ -1,31 +1,37 @@
 package com.swati.evtimebackend.entity;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
 
 @Entity
-@Data
+@Table(name = "users")
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name cannot be empty")
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @NotBlank(message = "Email cannot be empty")
-    @Email(message = "Invalid email format")
+    @Column(nullable = false, unique = true, length = 190)
     private String email;
 
-    @NotBlank(message = "Password cannot be empty")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    /** BCrypt hash, never the raw password. */
+    @Column(nullable = false)
     private String password;
-    
-    private String role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.USER;
+
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
 }
