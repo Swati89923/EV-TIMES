@@ -10,7 +10,7 @@ import java.io.IOException;
 @RestController
 public class FileUploadController {
 
-    @PostMapping("/upload")
+    @PostMapping("/api/uploads")
     public FileUploadResponseDTO uploadFile(
             @RequestParam("file")
             MultipartFile file)
