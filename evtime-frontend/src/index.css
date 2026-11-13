@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --color-brand-50: #e8fdf5;
+  --color-brand-100: #c3f9e3;
+  --color-brand-400: #19e6a6;
+  --color-brand-500: #07c78b;
+  --color-brand-600: #04a373;
+  --color-brand-700: #058059;
+  --color-ink: #0b1f1a;
+}
+
+html { scroll-behavior: smooth; }
+body { @apply bg-white text-neutral-900 font-sans antialiased dark:bg-neutral-950 dark:text-neutral-100; }
+h1, h2, h3, .font-headline { font-family: var(--font-serif); }
+:focus-visible { outline: 2px solid var(--color-brand-500); outline-offset: 2px; }
+
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker-track { animation: ticker 40s linear infinite; }
+.ticker-track:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
