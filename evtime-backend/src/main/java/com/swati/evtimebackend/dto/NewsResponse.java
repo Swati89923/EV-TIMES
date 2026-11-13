@@ -15,7 +15,10 @@ public record NewsResponse(
         boolean featured,
         long views,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        String sourceName,
+        String sourceUrl,
+        boolean external) {
 
     public static NewsResponse from(News n) {
         return new NewsResponse(
@@ -29,6 +32,14 @@ public record NewsResponse(
                 Boolean.TRUE.equals(n.getFeatured()),
                 n.getViews() == null ? 0L : n.getViews(),
                 n.getCreatedAt(),
-                n.getUpdatedAt());
+                n.getUpdatedAt(),
+                n.getSourceName(),
+                n.getSourceUrl(),
+                n.getExternalId() != null);
+    }
+
+    public NewsResponse withViews(long newViews) {
+        return new NewsResponse(id, title, description, content, imageUrl, category, author,
+                featured, newViews, createdAt, updatedAt, sourceName, sourceUrl, external);
     }
 }
