@@ -44,4 +44,7 @@ public interface NewsRepository
     @Query("delete from News n where n.externalId is not null and n.createdAt < :cutoff "
             + "and n.id not in (select b.news.id from Bookmark b)")
     int deleteOldImported(@Param("cutoff") Instant cutoff);
+
+    @Query("select n from News n where n.externalId is null order by n.createdAt desc")
+    List<News> findOriginalArticles(Pageable pageable);
 }

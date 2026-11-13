@@ -21,7 +21,8 @@ public class ChatController {
     private final ChatService chatService;
     private final RateLimiter rateLimiter;
 
-    public ChatController(ChatService chatService, RateLimiter rateLimiter) {
+    public ChatController(ChatService chatService,
+                          @org.springframework.beans.factory.annotation.Qualifier("chatRateLimiter") RateLimiter rateLimiter) {
         this.chatService = chatService;
         this.rateLimiter = rateLimiter;
     }
