@@ -1,21 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Bookmark, LayoutDashboard, LogOut, Menu, Moon, Search, Sun, User, X, Zap } from 'lucide-react'
+import { Bookmark, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Search, Sun, User, X, Zap } from 'lucide-react'
 import { getCategories, getNews } from '../api/news'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { categoryPath, formatDate } from '../utils/format'
+import Footer from './Footer'
+import { BackToTop, ScrollManager } from './ScrollManager'
 
 function Ticker() {
-  const { data } = useQuery({ queryKey: ['ticker'], queryFn: () => getNews({ page: 0, size: 8, sortBy: 'createdAt', direction: 'desc' }), staleTime: 60000 })
+  // refreshed every minute (paused while the tab is hidden) so headlines stay current
+  const { data } = useQuery({
+    queryKey: ['ticker'],
+    queryFn: () => getNews({ page: 0, size: 10, sortBy: 'createdAt', direction: 'desc' }),
+    staleTime: 30000,
+    refetchInterval: 60000,
+    refetchOnWindowFocus: 'always',
+  })
   const items = data?.content ?? []
   if (!items.length) return null
   const loop = [...items, ...items]
   return (
-    <div className="flex items-center overflow-hidden bg-ink text-white" aria-label="Breaking news">
-      <span className="z-10 flex shrink-0 items-center gap-1 bg-brand-500 px-3 py-2 text-xs font-extrabold uppercase tracking-wider text-ink">
-        <Zap className="h-3.5 w-3.5" /> Latest
+    <div className="flex items-center overflow-hidden bg-ink text-white" aria-label="Latest headlines">
+      <span className="z-10 flex shrink-0 items-center gap-1.5 bg-brand-500 px-3 py-2 text-xs font-extrabold uppercase tracking-wider text-ink">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600" />
+        </span>
+        Live
       </span>
       <div className="relative flex-1 overflow-hidden">
         <div className="ticker-track flex w-max gap-10 whitespace-nowrap py-2 pl-6 text-sm">
@@ -30,10 +43,58 @@ function Ticker() {
   )
 }
 
+function AccountMenu() {
+  const { user, isStaff, logout } = useAuth()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false)
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const item = 'flex w-full items-center gap-2 px-4 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800'
+
+  return (
+    <div className="relative hidden lg:block" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Account menu for ${user.name}`}
+        className="flex items-center gap-1 rounded-full p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold uppercase text-white">{(user.name || user.email || '?').charAt(0)}</span>
+        <ChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div role="menu" className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+            <p className="truncate text-sm font-semibold">{user.name}</p>
+            <p className="truncate text-xs text-neutral-500">{user.email}</p>
+          </div>
+          <Link role="menuitem" to="/profile" className={item} onClick={() => setOpen(false)}><User className="h-4 w-4" /> Profile</Link>
+          <Link role="menuitem" to="/bookmarks" className={item} onClick={() => setOpen(false)}><Bookmark className="h-4 w-4" /> Bookmarks</Link>
+          {isStaff && <Link role="menuitem" to="/admin" className={item} onClick={() => setOpen(false)}><LayoutDashboard className="h-4 w-4" /> Admin dashboard</Link>}
+          <button role="menuitem" onClick={() => { setOpen(false); logout() }} className={`${item} border-t border-neutral-200 dark:border-neutral-800`}><LogOut className="h-4 w-4" /> Sign out</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Header() {
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
-  const { isAuthenticated, isStaff, user, logout } = useAuth()
+  const { isAuthenticated, isStaff, logout } = useAuth()
   const { dark, toggle } = useTheme()
   const navigate = useNavigate()
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories, staleTime: 300000 })
@@ -77,16 +138,12 @@ function Header() {
             {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
           {isAuthenticated ? (
-            <div className="hidden items-center gap-1 lg:flex">
-              {isStaff && <Link to="/admin" className={iconBtn} aria-label="Admin dashboard"><LayoutDashboard className="h-5 w-5" /></Link>}
-              <Link to="/bookmarks" className={iconBtn} aria-label="Bookmarks"><Bookmark className="h-5 w-5" /></Link>
-              <Link to="/profile" className={iconBtn} aria-label={`Profile of ${user.name}`}><User className="h-5 w-5" /></Link>
-              <button className={iconBtn} onClick={logout} aria-label="Log out"><LogOut className="h-5 w-5" /></button>
-            </div>
+            <AccountMenu />
           ) : (
-            <Link to="/login" className="ml-1 hidden rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-white hover:bg-neutral-800 sm:block dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400">
-              Sign in
-            </Link>
+            <div className="ml-1 hidden items-center gap-2 sm:flex">
+              <Link to="/login" className="rounded-full px-3 py-1.5 text-sm font-semibold hover:bg-neutral-100 dark:hover:bg-neutral-800">Sign in</Link>
+              <Link to="/signup" className="rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-white hover:bg-neutral-800 dark:bg-brand-500 dark:text-ink dark:hover:bg-brand-400">Subscribe</Link>
+            </div>
           )}
         </div>
       </div>
@@ -116,12 +173,12 @@ function Header() {
                 {isStaff && <Link onClick={() => setOpen(false)} to="/admin" className="rounded-full border px-3 py-1.5 text-sm">Admin</Link>}
                 <Link onClick={() => setOpen(false)} to="/bookmarks" className="rounded-full border px-3 py-1.5 text-sm">Bookmarks</Link>
                 <Link onClick={() => setOpen(false)} to="/profile" className="rounded-full border px-3 py-1.5 text-sm">Profile</Link>
-                <button onClick={() => { logout(); setOpen(false) }} className="rounded-full border px-3 py-1.5 text-sm">Log out</button>
+                <button onClick={() => { logout(); setOpen(false) }} className="rounded-full border px-3 py-1.5 text-sm">Sign out</button>
               </>
             ) : (
               <>
-                <Link onClick={() => setOpen(false)} to="/login" className="rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-white">Sign in</Link>
-                <Link onClick={() => setOpen(false)} to="/signup" className="rounded-full border px-4 py-1.5 text-sm">Create account</Link>
+                <Link onClick={() => setOpen(false)} to="/login" className="rounded-full border px-4 py-1.5 text-sm">Sign in</Link>
+                <Link onClick={() => setOpen(false)} to="/signup" className="rounded-full bg-ink px-4 py-1.5 text-sm font-semibold text-white">Subscribe</Link>
               </>
             )}
           </div>
@@ -131,48 +188,17 @@ function Header() {
   )
 }
 
-function Footer() {
-  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories, staleTime: 300000 })
-  return (
-    <footer className="mt-16 bg-ink text-neutral-300">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
-        <div className="md:col-span-2">
-          <p className="font-headline text-2xl font-extrabold text-white">EV <span className="text-brand-400">TIMES</span></p>
-          <p className="mt-3 max-w-sm text-sm">Independent reporting and analysis on electric vehicles, batteries, charging infrastructure, policy and the markets that move them.</p>
-        </div>
-        <div>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-white">Sections</h3>
-          <ul className="space-y-2 text-sm">
-            {categories.map((c) => (
-              <li key={c}><Link className="hover:text-brand-400" to={categoryPath(c)}>{c}</Link></li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-white">Company</h3>
-          <ul className="space-y-2 text-sm">
-            <li><Link className="hover:text-brand-400" to="/about">About us</Link></li>
-            <li><Link className="hover:text-brand-400" to="/login">Sign in</Link></li>
-            <li><Link className="hover:text-brand-400" to="/signup">Create account</Link></li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-neutral-400">
-        © {new Date().getFullYear()} EV Times. All rights reserved.
-      </div>
-    </footer>
-  )
-}
-
 export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-brand-500 focus:px-4 focus:py-2">Skip to content</a>
+      <ScrollManager />
       <Header />
       <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         <Outlet />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   )
 }
