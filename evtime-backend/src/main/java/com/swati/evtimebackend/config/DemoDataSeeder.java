@@ -54,7 +54,7 @@ public class DemoDataSeeder implements ApplicationRunner {
                 new Seed(
                         "Solid-state batteries: what they promise and what still stands in the way",
                         "Higher energy density and faster charging make solid-state cells the most watched idea in EV engineering. Here is where the technology stands.",
-                        "Batteries", "1620714223084-8fcacc6dfd8d?w=1400&q=80", true, 940,
+                        "Batteries", "1581091226825-a6a2a5aee158?w=1400&q=80", true, 940,
                         "Solid-state batteries replace the liquid electrolyte in today's lithium-ion cells with a solid material. In theory this allows more energy to be packed into the same space, which can mean longer range or a lighter pack.\n\nThe same design may also tolerate faster charging and reduce the risk of leaks and thermal runaway. Those are the reasons nearly every major manufacturer and many start-ups run research programmes on the technology.\n\nThe obstacles are practical rather than theoretical. Solid electrolytes must stay in close contact with the electrodes through thousands of charge cycles, and manufacturing them at scale and at a competitive cost is still unproven.\n\nFor buyers, the realistic expectation is gradual progress: improved lithium-ion chemistries will keep arriving while solid-state designs move from pilot lines to limited production."),
                 new Seed(
                         "A beginner's guide to charging an EV at home",
@@ -64,7 +64,7 @@ public class DemoDataSeeder implements ApplicationRunner {
                 new Seed(
                         "How public fast-charging networks are being built out",
                         "Highway corridors, shopping centres and workplaces are all getting fast chargers. We look at how the networks are planned.",
-                        "Infrastructure", "1617788138017-80ad40651399?w=1400&q=80", false, 610,
+                        "Infrastructure", "1593941707874-ef25b8b4a92b?w=1400&q=80", false, 610,
                         "Fast-charging networks are usually built in stages. Operators first cover major highway corridors so long trips become possible, then add chargers in cities where many drivers cannot charge at home.\n\nSite selection depends on grid capacity as much as on traffic. A station with many high-power chargers needs a strong connection, and waiting for the grid upgrade is often the slowest part of a project.\n\nReliability matters as much as the number of plugs. Drivers consistently rank chargers that work first time, with simple payment, above chargers that are merely fast.\n\nExpect more sites to add batteries, solar canopies and amenities such as cafes, so that a charging stop feels like an ordinary break."),
                 new Seed(
                         "Understanding EV incentives: how purchase subsidies and tax rules work",
@@ -84,7 +84,7 @@ public class DemoDataSeeder implements ApplicationRunner {
                 new Seed(
                         "The rise of electric two-wheelers in dense cities",
                         "Scooters and motorcycles are often the first electric vehicle many households buy. Why they are growing so quickly.",
-                        "Market", "1558494949-ef010cbdcc31?w=1400&q=80", false, 520,
+                        "Market", "1604357209793-fca5dca89f97?w=1400&q=80", false, 520,
                         "Electric two-wheelers have lower purchase and running costs than cars, need smaller batteries, and can often be charged from a normal socket.\n\nIn crowded cities, where daily trips are short, a small battery is more than enough. Swappable battery systems go further by letting riders exchange an empty pack for a charged one in minutes.\n\nDelivery fleets are a major driver: predictable routes and high daily distances make the savings on fuel and maintenance easy to calculate.\n\nChallenges include fire safety for poorly made packs, so buyers should choose certified products and chargers."),
                 new Seed(
                         "How vehicle-to-grid technology could turn parked cars into power plants",
@@ -94,7 +94,7 @@ public class DemoDataSeeder implements ApplicationRunner {
                 new Seed(
                         "What drives the total cost of owning an electric car",
                         "The sticker price is only one number. Energy, maintenance, insurance and resale value all shape the real cost.",
-                        "Market", "1511919884226-fd3cad34687c?w=1400&q=80", false, 340,
+                        "Market", "1571987502227-9231b837d92a?w=1400&q=80", false, 340,
                         "Electric cars often cost more to buy but less to run. Electricity per kilometre is usually cheaper than fuel, particularly when charging at home on an off-peak tariff.\n\nMaintenance is simpler because there is no engine oil, fewer moving parts and less brake wear thanks to regenerative braking.\n\nInsurance, tyres and depreciation can offset part of the saving, and resale values depend on battery health and how quickly technology changes.\n\nThe best approach is to compare models over the period you expect to own the car, using your own mileage and local energy prices."),
                 new Seed(
                         "Grid readiness: can power networks handle millions of EVs?",
@@ -104,12 +104,12 @@ public class DemoDataSeeder implements ApplicationRunner {
                 new Seed(
                         "Lithium-ion chemistries compared: NMC versus LFP",
                         "Two battery chemistries dominate today's EVs. Each has strengths that suit different drivers.",
-                        "Batteries", "1581091226825-a6a2a5aee158?w=1400&q=80", false, 410,
+                        "Batteries", "1509391366360-2e959784a276?w=1400&q=80", false, 410,
                         "Nickel-manganese-cobalt (NMC) cells offer higher energy density, so they are common in long-range and performance models.\n\nLithium-iron-phosphate (LFP) cells store less energy for their weight, but they avoid cobalt and nickel, usually cost less and tolerate frequent full charging well.\n\nFor drivers who mostly commute, an LFP pack is often more than adequate and can last for a very large number of cycles.\n\nManufacturers increasingly offer both, choosing the chemistry that fits each model and price point."),
                 new Seed(
                         "Driver-assistance systems: what the levels of automation really mean",
                         "Marketing names can be confusing. The standard levels of driving automation explain what a system can and cannot do.",
-                        "Technology", "1492144534655-ae79c964c9d7?w=1400&q=80", false, 280,
+                        "Technology", "1617788138017-80ad40651399?w=1400&q=80", false, 280,
                         "Industry standards describe driving automation from level 0, where the human does everything, to level 5, where the vehicle drives itself in all conditions.\n\nMost cars sold today are at level 2: the system can steer and control speed together, but the driver must watch the road and be ready to take over at any moment.\n\nHigher levels require the system itself to handle the driving task in defined conditions, which brings questions of liability and regulation.\n\nWhatever a brand calls its feature, read the owner's manual to understand its limits and keep your attention on the road."));
 
         for (Seed s : seeds) {
