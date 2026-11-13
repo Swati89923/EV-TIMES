@@ -122,7 +122,7 @@ export default function Article() {
         <BookmarkButton id={news.id} />
       </div>
 
-      <SmartImage src={news.imageUrl} alt={news.title} loading="eager" className="my-6 aspect-[16/9] w-full rounded-xl" />
+      <SmartImage src={news.imageUrl} alt={news.title} loading="eager" fetchpriority="high" className="my-6 aspect-[16/9] w-full rounded-xl" />
 
       {news.external && !news.content ? (
         <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-800 dark:bg-neutral-900">

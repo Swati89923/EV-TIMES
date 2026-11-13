@@ -58,7 +58,7 @@ export default function ArticleCard({ news, variant = 'card', index = 0 }) {
     return (
       <motion.article className="group relative overflow-hidden rounded-xl bg-ink" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
         <Link to={link} aria-label={news.title}>
-          <SmartImage src={news.imageUrl} alt="" className="kenburns aspect-[16/10] w-full opacity-80 transition-opacity duration-500 group-hover:opacity-90 md:aspect-[16/9]" loading="eager" />
+          <SmartImage src={news.imageUrl} alt="" className="kenburns aspect-[16/10] w-full opacity-80 transition-opacity duration-500 group-hover:opacity-90 md:aspect-[16/9]" loading="eager" fetchpriority="high" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
         </Link>
         <div className="absolute inset-x-0 bottom-0 space-y-2 p-5 text-white md:p-8">

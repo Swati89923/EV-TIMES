@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { useQuery } from '@tanstack/react-query'
@@ -10,7 +10,7 @@ import { categoryPath, formatDate } from '../utils/format'
 import Footer from './Footer'
 import { Avatar } from './ui'
 import { BackToTop, ScrollManager } from './ScrollManager'
-import ChatWidget from './ChatWidget'
+const ChatWidget = lazy(() => import('./ChatWidget'))
 
 function Ticker() {
   // refreshed every minute (paused while the tab is hidden) so headlines stay current
@@ -258,7 +258,7 @@ export default function Layout() {
       </main>
       <Footer />
       <BackToTop />
-      <ChatWidget />
+      <Suspense fallback={null}><ChatWidget /></Suspense>
     </div>
   )
 }
